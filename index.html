@@ -3264,9 +3264,9 @@ function showAdminTab(tab) {
             <div><label class="form-label">Eyebrow Text</label><input class="form-input" value="New Season 2025" id="heroEyebrow"/></div>
             <div><label class="form-label">Main Title</label><input class="form-input" value="Dress Your Confidence" id="heroTitle"/></div>
             <div><label class="form-label">Subtitle</label><textarea class="form-input" rows="2" id="heroSub">Discover premium fashion that speaks before you do.</textarea></div>
-            <div><label class="form-label">Button Text</label><input class="form-input" value="Shop Collection" id="heroBtnText"/></div>
+            <div><label class="form-label">Button Text</label><input class="form-input" value="Shop Collection" id="heroButtonText"/></div>
             <div><label class="form-label">Button Link</label><input class="form-input" value="#shop" id="heroBtnLink"/></div>
-            <div id="heroUrlHelp" style="font-size:12px;color:#64748b;background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;line-height:1.55">Use a direct media URL. Image URLs should end in an image file or return an image directly. Video URLs must point directly to a playable <b>.mp4</b> or <b>.webm</b> file — YouTube/Instagram page URLs cannot be used as a video source.</div>
+            <div id="heroUrlHelp" style="font-size:12px;color:#64748b;background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;line-height:1.55">Use a direct media URL. Image URLs should end in an image file or return an image directly. Video: direct MP4/WebM URLs work, and YouTube/Vimeo video links are also supported automatically. For Google Drive, use a direct/public media URL.</div>
             <button class="btn btn-dark btn-sm" style="width:fit-content;" onclick="saveHeroSettings()">Save Hero</button>
           </div>
         </div>
@@ -3788,15 +3788,21 @@ function toggleHeroMediaFields(){
   if(vf)vf.style.display=type==='video'?'block':'none';
   if(inf)inf.style.display=type==='image'?'block':'none';
 }
-function loadHeroForm(){const h=adminData.hero||{};const map={heroMediaType:h.mediaType||'image',heroVideoUrl:h.videoUrl||'',heroImageUrls:(h.images||[]).join('\n'),heroEyebrow:h.eyebrow||'',heroTitle:h.title||'',heroSubtitle:h.subtitle||'',heroButtonText:h.buttonText||'',heroButtonUrl:h.buttonUrl||''};Object.keys(map).forEach(id=>{const e=document.getElementById(id);if(e)e.value=map[id]||''});const v=document.getElementById('heroVisible');if(v)v.checked=h.visible!==false;toggleHeroMediaFields()}
+function loadHeroForm(){const h=adminData.hero||{};const map={heroMediaType:h.mediaType||'image',heroVideoUrl:h.videoUrl||'',heroImageUrls:(h.images||[]).join('\n'),heroEyebrow:h.eyebrow||'',heroTitle:h.title||'',heroSubtitle:h.subtitle||'',heroButtonText:h.buttonText||'',heroButtonUrl:h.buttonUrl||'#shop'};Object.keys(map).forEach(id=>{const e=document.getElementById(id);if(e)e.value=map[id]||''});const v=document.getElementById('heroVisible');if(v)v.checked=h.visible!==false;toggleHeroMediaFields()}
 function saveHeroSettings(){
   const mediaType=document.getElementById('heroMediaType')?.value||'image';
   const videoUrl=String(document.getElementById('heroVideoUrl')?.value||'').trim();
-  const images=String(document.getElementById('heroImageUrls')?.value||'').split('\n').map(x=>x.trim()).filter(Boolean);
-  adminData.hero={mediaType,videoUrl,images,eyebrow:document.getElementById('heroEyebrow')?.value||'',title:document.getElementById('heroTitle')?.value||'',subtitle:document.getElementById('heroSubtitle')?.value||'',buttonText:document.getElementById('heroButtonText')?.value||'',buttonUrl:document.getElementById('heroButtonUrl')?.value||'#shop',visible:document.getElementById('heroVisible')?.checked!==false};
-  saveAdminData();applyHeroToSite();renderHeroPreview();showToast('Hero saved','success');
+  const images=String(document.getElementById('heroImageUrls')?.value||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);
+  const hero={mediaType,videoUrl,images,eyebrow:document.getElementById('heroEyebrow')?.value||'',title:document.getElementById('heroTitle')?.value||'',subtitle:document.getElementById('heroSubtitle')?.value||'',buttonText:document.getElementById('heroButtonText')?.value||'',buttonUrl:document.getElementById('heroButtonUrl')?.value||'#shop',visible:document.getElementById('heroVisible')?.checked!==false};
+  adminData.hero=hero;
+  saveAdminData();
+  applyHeroToSite();
+  renderHeroPreview();
+  showToast('Hero saved successfully','success');
 }
-function renderHeroPreview(){const el=document.getElementById('heroAdminPreview');if(!el)return;const h=adminData.hero;if(!h.visible){el.innerHTML='<span>Hero hidden</span>';return}if(h.mediaType==='video'&&h.videoUrl)el.innerHTML=`<video src="${esc(h.videoUrl)}" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover"></video>`;else if(h.images.length)el.innerHTML=`<img src="${esc(h.images[0])}" style="width:100%;height:100%;object-fit:cover">`;else el.innerHTML='<span>Add a video URL or image URLs</span>'}
+function heroVideoEmbedUrl(url){const u=String(url||'').trim();try{const x=new URL(u);const host=x.hostname.replace(/^www\./,'').toLowerCase();if(host==='youtube.com'||host==='youtu.be'){let id=x.searchParams.get('v');if(!id&&host==='youtu.be')id=x.pathname.slice(1);if(!id&&x.pathname.startsWith('/embed/'))id=x.pathname.split('/')[2];if(id)return 'https://www.youtube.com/embed/'+encodeURIComponent(id)+'?autoplay=1&mute=1&loop=1&playlist='+encodeURIComponent(id)+'&controls=0&rel=0&modestbranding=1';}if(host==='vimeo.com'||host==='player.vimeo.com'){let m=x.pathname.match(/(?:video\/)?(\d+)/);if(m)return 'https://player.vimeo.com/video/'+m[1]+'?autoplay=1&muted=1&loop=1&background=1&title=0&byline=0&portrait=0';}}catch(e){}return ''}
+function heroMediaIsDirectVideo(url){return /\.(mp4|webm|ogg|mov)(?:[?#].*)?$/i.test(String(url||''))}
+function renderHeroPreview(){const el=document.getElementById('heroAdminPreview');if(!el)return;const h=adminData.hero||{};if(!h.visible){el.innerHTML='<span>Hero hidden</span>';return}const u=String(h.videoUrl||'').trim();const embed=heroVideoEmbedUrl(u);if(h.mediaType==='video'&&u){if(embed)el.innerHTML=`<iframe src="${esc(embed)}" allow="autoplay; fullscreen" style="width:100%;height:100%;border:0;object-fit:cover;pointer-events:none"></iframe>`;else el.innerHTML=`<video src="${esc(u)}" autoplay muted loop playsinline controls style="width:100%;height:100%;object-fit:cover"></video>`;return}if(Array.isArray(h.images)&&h.images.length)el.innerHTML=`<img src="${esc(h.images[0])}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`;else el.innerHTML='<span>Add a video URL or image URLs</span>'}
 function applyPromiseToSite(){const el=document.getElementById('storePromiseSection');if(!el)return;const d=loadAdminData(),p=d.promise||{};const cards=Array.isArray(p.cards)?p.cards.filter(x=>x&&x.visible!==false).slice(0,3):[];if(p.visible===false||!cards.length){el.style.display='none';el.innerHTML='';return;}el.style.display='block';el.innerHTML=`<section class="wow-promise-section"><div class="wow-promise-wrap"><div class="wow-promise-label">${esc(p.label||'Our Promise')}</div><h2 class="wow-promise-title">${esc(p.title||'Why Shop With Us?')}</h2><p class="wow-promise-desc">${esc(p.description||'')}</p><div class="wow-promise-grid">${cards.map(c=>`<div class="wow-promise-card"><div class="wow-promise-icon"><i data-lucide="${esc(c.icon||'star')}"></i></div><h3>${esc(c.title||'')}</h3><p>${esc(c.text||'')}</p></div>`).join('')}</div></div></section>`;if(window.lucide?.createIcons)lucide.createIcons();}
 function applyBenefitsToSite(){
   const el=document.getElementById('storeBenefitsBar');
@@ -3813,30 +3819,41 @@ function applyHeroToSite(){
   const h=adminData.hero||{}, hero=document.querySelector('.hero-section');
   if(!hero)return;
   hero.style.display=h.visible===false?'none':'flex';
+  clearInterval(window.__wowHeroTimer);
   hero.querySelectorAll('.v6-media').forEach(x=>x.remove());
   const shell=document.createElement('div'); shell.className='v6-media';
   shell.style.cssText='position:absolute;inset:0;width:100%;height:100%;z-index:0;overflow:hidden;pointer-events:none;background:#050b16';
   hero.insertBefore(shell,hero.firstChild);
   const type=h.mediaType||'image';
-  if(type==='video' && h.videoUrl){
-    const v=document.createElement('video');
-    v.src=String(h.videoUrl).trim(); v.autoplay=true; v.muted=true; v.defaultMuted=true; v.loop=true; v.playsInline=true; v.preload='auto';
-    v.setAttribute('playsinline','');v.setAttribute('webkit-playsinline','');v.setAttribute('muted','');v.setAttribute('autoplay','');v.setAttribute('loop','');
-    v.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block;background:#050b16';
-    v.onerror=()=>{shell.innerHTML='';const im=document.createElement('img');im.src=(h.images||[])[0]||'';im.alt='';im.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover';shell.appendChild(im)};
-    shell.appendChild(v); v.play().catch(()=>{});
+  const videoUrl=String(h.videoUrl||'').trim();
+  if(type==='video' && videoUrl){
+    const embed=heroVideoEmbedUrl(videoUrl);
+    if(embed){
+      const frame=document.createElement('iframe');
+      frame.src=embed; frame.allow='autoplay; fullscreen'; frame.setAttribute('allowfullscreen','');
+      frame.style.cssText='position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none';
+      shell.appendChild(frame);
+    }else{
+      const v=document.createElement('video');
+      v.src=videoUrl; v.autoplay=true; v.muted=true; v.defaultMuted=true; v.loop=true; v.playsInline=true; v.preload='auto';
+      v.setAttribute('playsinline','');v.setAttribute('webkit-playsinline','');v.setAttribute('muted','');v.setAttribute('autoplay','');v.setAttribute('loop','');
+      v.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block;background:#050b16';
+      v.onerror=()=>{
+        if(Array.isArray(h.images)&&h.images.length){shell.innerHTML='';const im=document.createElement('img');im.src=h.images[0];im.alt='';im.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover';shell.appendChild(im);}
+      };
+      shell.appendChild(v); const play=v.play(); if(play&&play.catch)play.catch(()=>{});
+    }
   }else if(Array.isArray(h.images)&&h.images.length){
     const im=document.createElement('img');im.alt='';im.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center';
-    let i=0; const show=()=>{im.src=h.images[i];i=(i+1)%h.images.length}; show();
+    let i=0; const show=()=>{const url=String(h.images[i]||'').trim();if(url)im.src=url;i=(i+1)%h.images.length}; show();
     im.onerror=()=>{im.style.display='none'}; shell.appendChild(im);
-    if(h.images.length>1){clearInterval(window.__wowHeroTimer);window.__wowHeroTimer=setInterval(show,5000)}
+    if(h.images.length>1)window.__wowHeroTimer=setInterval(show,5000);
   }
   const he=hero.querySelector('.hero-eyebrow'),ht=hero.querySelector('.hero-title'),hs=hero.querySelector('.hero-sub'),pb=hero.querySelector('#heroPrimaryBtn'),sb=hero.querySelector('#heroSecondaryBtn');
   if(he)he.textContent=h.eyebrow||''; if(ht)ht.innerHTML=esc(h.title||'').replace(/\n/g,'<br>'); if(hs)hs.textContent=h.subtitle||'';
   if(pb){pb.childNodes[0].nodeValue=(h.buttonText||'Shop Collection')+' ';pb.onclick=()=>openHeroLink(h.buttonUrl||'#shop')}
-  if(sb){sb.style.display='none'}
+  if(sb)sb.style.display='none';
 }
-
 function adminOpenBanner(id,slot){const existing=id?adminData.banners.find(x=>x.id===id):adminData.banners.find(x=>x.position===slot);const b=existing||{id:uid('b'),title:'',desktop:'',mobile:'',description:'',button:'Shop Now',url:'#shop',category:'',position:slot||'mid',visible:true,order:slot==='mid'?1:2};adminModal(`<h2>${existing?'Edit':'Add'} Banner</h2><div class="admin-form"><div class="admin-field"><label>Banner slot</label><select id="abPosition"><option value="mid">Banner 1 — below products</option><option value="bottom">Banner 2 — below Banner 1</option></select></div><div class="admin-two"><div class="admin-field"><label>Title</label><input id="abTitle" value="${esc(b.title)}"></div><div class="admin-field"><label>Category link</label><input id="abCategory" value="${esc(b.category||'')}"></div></div><div class="admin-field"><label>Desktop image URL</label><input id="abDesktop" value="${esc(b.desktop)}"></div><div class="admin-field"><label>Mobile image URL</label><input id="abMobile" value="${esc(b.mobile)}"></div><div class="admin-field"><label>Upload banner image</label><input type="file" accept="image/*" onchange="readSingleImage(this,'abDesktop')"></div><div class="admin-field"><label>Description</label><textarea id="abDesc">${esc(b.description)}</textarea></div><div class="admin-three"><div class="admin-field"><label>Button</label><input id="abButton" value="${esc(b.button)}"></div><div class="admin-field"><label>URL</label><input id="abUrl" value="${esc(b.url)}"></div><div class="admin-field"><label>Visible</label><select id="abVisible"><option value="1" ${b.visible!==false?'selected':''}>Show</option><option value="0" ${b.visible===false?'selected':''}>Hide</option></select></div></div><div><button class="admin-btn" onclick="closeAdminModal()">Cancel</button><button class="admin-btn primary" onclick="saveBanner('${b.id}')">Save Banner</button></div></div>`);document.getElementById('abPosition').value=b.position||slot||'mid'}
 function saveBanner(id){const old=adminData.banners.find(x=>x.id===id);const position=document.getElementById('abPosition').value;adminData.banners=adminData.banners.filter(x=>x.id===id||x.position!==position);const b={id,title:document.getElementById('abTitle').value,category:document.getElementById('abCategory').value,desktop:document.getElementById('abDesktop').value,mobile:document.getElementById('abMobile').value,description:document.getElementById('abDesc').value,button:document.getElementById('abButton').value,url:document.getElementById('abUrl').value,position,visible:document.getElementById('abVisible').value==='1',order:position==='mid'?1:2};const i=adminData.banners.findIndex(x=>x.id===id);if(i>=0)adminData.banners[i]=b;else adminData.banners.push(b);saveAdminData();closeAdminModal();renderAdminAll();showToast('Banner saved','success')}
 function renderBannersAdmin(){const el=document.getElementById('adminBannersList');if(!el)return;const mid=adminData.banners.find(x=>x.position==='mid');const bot=adminData.banners.find(x=>x.position==='bottom');const slot=(label,b,pos)=>`<div class="admin-card" style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;gap:14px;align-items:center"><div><div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:#64748b;font-weight:800">${label}</div><h3 style="margin:5px 0">${b?esc(b.title||'Untitled'):'Empty banner slot'}</h3><div style="font-size:12px;color:#6b7280">${b?(b.visible===false?'Hidden':'Visible'):'No banner added'}</div></div>${b?.desktop?`<img class="admin-media" style="width:100px;height:60px" src="${esc(b.desktop)}">`:''}<div><button class="admin-btn" onclick="adminOpenBanner('${b?.id||''}','${pos}')">${b?'Edit':'Add Banner'}</button>${b?`<button class="admin-btn" onclick="toggleBanner('${b.id}')">${b.visible===false?'Show':'Hide'}</button><button class="admin-btn danger" onclick="deleteBanner('${b.id}')">Delete</button>`:''}</div></div></div>`;el.innerHTML=slot('Banner 1 — directly below the product section',mid,'mid')+slot('Banner 2 — directly below Banner 1',bot,'bottom')}
