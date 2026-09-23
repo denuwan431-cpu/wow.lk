@@ -629,6 +629,188 @@ body.wow-ready #site-header{opacity:1}
   }
 </style>
 
+
+<style id="wow-mobile-pro-layout">
+/* =========================================================
+   WOWSHOPPING — Mobile storefront shell
+   Desktop layout remains unchanged; these rules activate only
+   on phone-sized screens.
+   ========================================================= */
+@media (max-width: 767px) {
+  html, body { width:100%; max-width:100%; overflow-x:hidden; }
+  body { padding-bottom: calc(78px + env(safe-area-inset-bottom)); }
+
+  /* Clean, app-like mobile header */
+  #site-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1200 !important;
+    background:#fff !important;
+    border-bottom:1px solid #eceff3 !important;
+    box-shadow:0 4px 18px rgba(15,23,42,.045);
+  }
+  #site-header .top-bar { display:none !important; }
+  #site-header > div { max-width:none !important; width:100% !important; padding:0 !important; }
+  .wow-main-header-row {
+    width:100% !important;
+    display:flex !important;
+    flex-wrap:wrap !important;
+    align-items:center !important;
+    gap:0 !important;
+    padding:14px 14px 12px !important;
+  }
+  .wow-main-header-row > div:first-child {
+    width:100% !important;
+    flex:0 0 100% !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    padding:0 2px 12px !important;
+  }
+  .wow-main-header-row #siteBrandIcon { display:none !important; }
+  .wow-main-header-row #siteBrandName {
+    font-size:20px !important;
+    font-weight:900 !important;
+    letter-spacing:-.8px !important;
+    line-height:1 !important;
+    color:#111827 !important;
+  }
+  .wow-main-header-row #siteBrandSuffix { display:none !important; }
+
+  /* Search is the only control row below the logo on mobile. */
+  .wow-main-header-row .desktop-search {
+    order:2 !important;
+    display:flex !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:none !important;
+    flex:0 0 100% !important;
+    position:relative !important;
+  }
+  .wow-main-header-row .desktop-search .search-input {
+    width:100% !important;
+    height:48px !important;
+    min-height:48px !important;
+    padding:0 46px 0 43px !important;
+    border:1px solid #dfe4ea !important;
+    border-radius:14px !important;
+    background:#f8fafc !important;
+    font-size:15px !important;
+    color:#111827 !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.8) !important;
+  }
+  .wow-main-header-row .desktop-search > svg {
+    left:15px !important;
+    width:18px !important;
+    height:18px !important;
+    color:#94a3b8 !important;
+  }
+  .wow-main-header-row .desktop-search .search-input:focus {
+    background:#fff !important;
+    border-color:#cbd5e1 !important;
+    box-shadow:0 0 0 4px rgba(15,23,42,.05) !important;
+  }
+
+  /* Remove the desktop action icons above the search on phones. */
+  .wow-header-actions { display:none !important; }
+  #desktopNav { display:none !important; }
+  #hamburgerBtn { display:none !important; }
+
+  /* Full-width mobile hero: media is visible behind the content. */
+  .hero-section {
+    width:100vw !important;
+    max-width:none !important;
+    margin-left:calc(50% - 50vw) !important;
+    margin-right:calc(50% - 50vw) !important;
+    min-height:0 !important;
+    height:min(72vh, 620px) !important;
+    height:min(72svh, 620px) !important;
+    overflow:hidden !important;
+  }
+  .hero-section .v6-media,
+  .hero-section .v6-media video,
+  .hero-section .v6-media iframe,
+  .hero-section .v34-hero-video {
+    display:block !important;
+    visibility:visible !important;
+    opacity:1 !important;
+  }
+  .hero-section .v6-media { z-index:0 !important; }
+  .hero-section .hero-content { z-index:4 !important; }
+  .hero-section > div:first-child { padding:0 20px 34px !important; }
+  .hero-title { font-size:clamp(36px,10.5vw,56px) !important; line-height:1.02 !important; }
+  .hero-sub { font-size:14px !important; line-height:1.55 !important; margin-bottom:20px !important; }
+  .hero-actions .btn { min-height:44px !important; padding:11px 17px !important; }
+
+  /* Fixed app-style bottom navigation */
+  #wow-mobile-bottom-nav {
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:5000;
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    min-height:68px;
+    padding:7px 7px calc(7px + env(safe-area-inset-bottom));
+    background:rgba(255,255,255,.97);
+    border-top:1px solid #e7ebef;
+    box-shadow:0 -8px 28px rgba(15,23,42,.08);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+  }
+  #wow-mobile-bottom-nav .wow-mobile-tab {
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    min-width:0;
+    border:0;
+    background:transparent;
+    color:#64748b;
+    font:600 10px/1 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  #wow-mobile-bottom-nav .wow-mobile-tab svg {
+    width:21px;
+    height:21px;
+    stroke-width:1.9;
+  }
+  #wow-mobile-bottom-nav .wow-mobile-tab:active { transform:scale(.94); }
+  #wow-mobile-bottom-nav .wow-mobile-tab.active { color:#111827; }
+  #wow-mobile-bottom-nav .wow-mobile-tab.active svg { stroke-width:2.35; }
+  #wow-mobile-bottom-nav .wow-mobile-badge {
+    position:absolute;
+    top:4px;
+    margin-left:19px;
+    min-width:15px;
+    height:15px;
+    padding:0 4px;
+    border-radius:99px;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:#111827;
+    color:#fff;
+    font-size:8px;
+    font-weight:800;
+    line-height:15px;
+  }
+
+  /* Prevent fixed navigation from covering page content. */
+  #site-footer { margin-bottom:0 !important; }
+  .toast-container { bottom:calc(84px + env(safe-area-inset-bottom)) !important; right:12px !important; left:12px !important; }
+  .toast { max-width:none !important; }
+}
+
+@media (min-width:768px) {
+  #wow-mobile-bottom-nav { display:none !important; }
+}
+</style>
+
 </head>
 <body>
 <div class="wow-loader" id="wowLoader"><div class="wow-loader-inner"><div class="wow-loader-brand">WOWSHOPPING.lk</div><div class="wow-loader-line"></div><div class="wow-loader-dot">LOADING</div></div></div>
@@ -712,7 +894,7 @@ body.wow-ready #site-header{opacity:1}
   </div>
   <!-- Main Header -->
   <div style="max-width:1400px;margin:0 auto;padding:0 20px;">
-    <div style="display:flex;align-items:center;gap:16px;padding:14px 0;">
+    <div class="wow-main-header-row" style="display:flex;align-items:center;gap:16px;padding:14px 0;">
       <!-- Logo -->
       <div onclick="navigate('home')" style="cursor:pointer;flex-shrink:0;">
         <div style="display:flex;align-items:center;gap:0;">
@@ -731,7 +913,7 @@ body.wow-ready #site-header{opacity:1}
         <input id="headerSearchInput" type="text" placeholder="Search products, brands..." class="search-input" onfocus="openSearch()" oninput="syncSearchInput(this.value)"/>
       </div>
       <!-- Actions -->
-      <div style="display:flex;align-items:center;gap:4px;margin-left:auto;">
+      <div class="wow-header-actions" style="display:flex;align-items:center;gap:4px;margin-left:auto;">
         <button class="btn-ghost" onclick="openSearch()" title="Search">
           <i data-lucide="search" style="width:20px;height:20px;"></i>
         </button>
@@ -803,6 +985,53 @@ body.wow-ready #site-header{opacity:1}
     </nav>
   </div>
 </header>
+
+
+<!-- ===== MOBILE APP NAVIGATION ===== -->
+<nav id="wow-mobile-bottom-nav" aria-label="Mobile navigation">
+  <button class="wow-mobile-tab active" data-mobile-page="home" onclick="navigate('home')" aria-label="Home">
+    <i data-lucide="home"></i><span>Home</span>
+  </button>
+  <button class="wow-mobile-tab" data-mobile-page="shop" onclick="navigate('shop')" aria-label="Shop">
+    <i data-lucide="shopping-bag"></i><span>Shop</span>
+  </button>
+  <button class="wow-mobile-tab" data-mobile-page="search" onclick="openSearch()" aria-label="Search">
+    <i data-lucide="search"></i><span>Search</span>
+  </button>
+  <button class="wow-mobile-tab" data-mobile-page="cart" onclick="openCart()" aria-label="Cart">
+    <i data-lucide="shopping-cart"></i><span>Cart</span><b class="wow-mobile-badge" id="wowMobileCartBadge"></b>
+  </button>
+  <button class="wow-mobile-tab" data-mobile-page="account" onclick="openAuth('login')" aria-label="Account">
+    <i data-lucide="user-round"></i><span>Account</span>
+  </button>
+</nav>
+<script>
+(function(){
+  function syncMobileNav(){
+    var nav=document.getElementById('wow-mobile-bottom-nav');
+    if(!nav) return;
+    var page=String(window.currentPage||'home').toLowerCase();
+    nav.querySelectorAll('.wow-mobile-tab').forEach(function(btn){
+      var key=btn.getAttribute('data-mobile-page');
+      btn.classList.toggle('active', key===page || (key==='shop' && page==='product'));
+    });
+    var badge=document.getElementById('wowMobileCartBadge');
+    if(badge){
+      var count=0;
+      try{ count=(JSON.parse(localStorage.getItem('wow_cart')||'[]')||[]).reduce(function(n,x){return n+(Number(x.qty)||1)},0); }catch(e){}
+      badge.textContent=count>99?'99+':String(count);
+      badge.style.display=count>0?'flex':'none';
+    }
+    if(window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+  }
+  window.syncMobileNav=syncMobileNav;
+  window.addEventListener('load',function(){setTimeout(syncMobileNav,150);});
+  window.addEventListener('hashchange',function(){setTimeout(syncMobileNav,30);});
+  window.addEventListener('storage',syncMobileNav);
+  setInterval(syncMobileNav,1200);
+})();
+</script>
+
 
 <!-- ===== PAGES ===== -->
 <main id="mainContent">
@@ -3732,8 +3961,20 @@ function patch(){
       frame.allow='autoplay; fullscreen; picture-in-picture';
       frame.setAttribute('allowfullscreen','');
       frame.setAttribute('playsinline','');
+      frame.setAttribute('loading','eager');
       frame.style.cssText='position:absolute;inset:0;display:block;width:100%;height:100%;min-width:100%;min-height:100%;border:0;pointer-events:none;background:#050b16;';
       shell.appendChild(frame);
+      /* If an embedded provider is blocked/slow, do not leave a blank black hero. */
+      if((h.images||[]).length){
+        setTimeout(function(){
+          if(frame.isConnected && document.visibilityState!=='hidden'){
+            var img=document.createElement('img');
+            img.src=h.images[0]; img.alt='';
+            img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;display:block;';
+            shell.innerHTML=''; shell.appendChild(img);
+          }
+        }, 9000);
+      }
     }else{
       const v=document.createElement('video');
       v.src=h.videoUrl; v.autoplay=true; v.muted=true; v.defaultMuted=true; v.loop=true; v.playsInline=true;
