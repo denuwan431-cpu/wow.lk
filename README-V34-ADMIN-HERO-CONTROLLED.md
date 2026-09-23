@@ -1,0 +1,1 @@
+V34 update: all visible hero video content is editable from standalone admin.html, including video URL, eyebrow, title, subtitle, primary/secondary button text and URLs, plus show/hide. Home banner carousel remains editable from Banner Carousel. Data uses wow_admin_data_v4 localStorage.

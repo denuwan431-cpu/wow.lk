@@ -1,0 +1,67 @@
+{
+  "functions": {
+    "source": "functions"
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "firestore.rules",
+      "functions/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/sendOtp",
+        "function": {
+          "functionId": "sendOtp",
+          "region": "asia-south1"
+        }
+      },
+      {
+        "source": "/verifyOtp",
+        "function": {
+          "functionId": "verifyOtp",
+          "region": "asia-south1"
+        }
+      },
+      {
+        "source": "/listUsers",
+        "function": {
+          "functionId": "listUsers",
+          "region": "asia-south1"
+        }
+      },
+      {
+        "source": "/createPayHereCheckout",
+        "function": {
+          "functionId": "createPayHereCheckout",
+          "region": "asia-south1"
+        }
+      },
+      {
+        "source": "/payhereNotify",
+        "function": {
+          "functionId": "payhereNotify",
+          "region": "asia-south1"
+        }
+      },
+      {
+        "source": "/savePayHereCredentials",
+        "function": {
+          "functionId": "savePayHereCredentials",
+          "region": "asia-south1"
+        }
+      },
+      {
+        "source": "/getPayHereCredentialStatus",
+        "function": {
+          "functionId": "getPayHereCredentialStatus",
+          "region": "asia-south1"
+        }
+      }
+    ]
+  }
+}

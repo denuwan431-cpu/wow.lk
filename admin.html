@@ -1,0 +1,753 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WOWSHOPPING Admin</title><style>
+*{box-sizing:border-box}
+:root{
+  --admin-bg:#f6f7f9;
+  --admin-panel:#fff;
+  --admin-border:#e5e7eb;
+  --admin-text:#111827;
+  --admin-muted:#6b7280;
+  --admin-sidebar:#111827;
+  --admin-sidebar-hover:#1f2937;
+  --admin-accent:#60a5fa;
+}
+html,body{min-height:100%}
+body{
+  margin:0;
+  font:14px Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:var(--admin-bg);
+  color:var(--admin-text);
+}
+button,input,textarea,select{font:inherit}
+button{transition:all .15s ease}
+.app{display:flex;min-height:100vh;background:var(--admin-bg)}
+.side{
+  width:250px;
+  min-height:100vh;
+  flex-shrink:0;
+  position:fixed;
+  inset:0 auto 0 0;
+  z-index:20;
+  display:flex;
+  flex-direction:column;
+  background:var(--admin-sidebar);
+  color:#fff;
+  box-shadow:8px 0 30px rgba(15,23,42,.08);
+}
+.brand{
+  padding:22px 20px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  font-weight:800;
+  font-size:18px;
+  line-height:1.15;
+  letter-spacing:.1px;
+}
+.brand small{
+  display:block;
+  margin-top:4px;
+  color:#94a3b8!important;
+  font-size:11px!important;
+  letter-spacing:1.4px;
+}
+.nav{
+  padding:12px;
+  overflow:auto;
+  display:grid;
+  gap:4px;
+}
+.nav button{
+  width:100%;
+  border:0;
+  background:transparent;
+  color:#d1d5db;
+  text-align:left;
+  padding:11px 12px;
+  border-radius:7px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font:inherit;
+  font-weight:600;
+}
+.nav button:hover,.nav button.active{
+  background:var(--admin-sidebar-hover);
+  color:#fff;
+}
+.nav button.active{
+  color:var(--admin-accent);
+}
+.main{
+  margin-left:250px;
+  width:calc(100% - 250px);
+  min-width:0;
+  min-height:100vh;
+  overflow:auto;
+  background:var(--admin-bg);
+}
+.top{
+  min-height:68px;
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:#fff;
+  border-bottom:1px solid var(--admin-border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  padding:14px 24px;
+}
+.top h1{
+  font-size:24px;
+  font-weight:800;
+  letter-spacing:-.3px;
+}
+.top .muted{margin-top:3px}
+.view{display:none}
+.view.active{display:block}
+#views{padding:24px;max-width:1500px;margin:0 auto}
+.card{
+  background:var(--admin-panel);
+  border:1px solid var(--admin-border);
+  border-radius:10px;
+  padding:18px;
+  margin-bottom:14px;
+  box-shadow:none;
+}
+.toolbar{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+  margin-bottom:14px;
+  flex-wrap:wrap;
+}
+.toolbar b{font-size:18px}
+.btn{
+  border:1px solid #d1d5db;
+  background:#fff;
+  color:#111827;
+  border-radius:7px;
+  padding:9px 13px;
+  cursor:pointer;
+  font-weight:600;
+}
+.btn:hover{background:#f9fafb;transform:translateY(-1px)}
+.primary{background:#111827;color:#fff;border-color:#111827}
+.primary:hover{background:#1f2937}
+.danger{color:#b91c1c}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px;
+}
+.stat{font-size:26px;font-weight:800;margin-top:6px}
+.label{
+  font-size:12px;
+  color:#6b7280;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{
+  padding:12px;
+  border-bottom:1px solid #eee;
+  text-align:left;
+  font-size:13px;
+  vertical-align:middle;
+}
+.table th{
+  font-size:11px;
+  text-transform:uppercase;
+  color:#6b7280;
+}
+.table tr:last-child td{border-bottom:0}
+.table tr:hover td{background:#fafafa}
+.thumb{
+  width:58px;
+  height:58px;
+  object-fit:cover;
+  border-radius:6px;
+  border:1px solid #edf0f4;
+}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.row{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  align-items:center;
+  padding:12px;
+  border-bottom:1px solid #eee;
+}
+.form{display:grid;gap:14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field{display:grid;gap:6px}
+.field label{font-size:12px;font-weight:700;color:#374151}
+.field input,.field textarea,.field select{
+  width:100%;
+  padding:10px;
+  border:1px solid #d1d5db;
+  border-radius:7px;
+  background:#fff;
+  outline:none;
+  font:inherit;
+}
+.field input:focus,.field textarea:focus,.field select:focus{
+  border-color:#6b7280;
+  box-shadow:0 0 0 3px rgba(17,24,39,.06);
+}
+.field textarea{min-height:100px;resize:vertical}
+.switch{display:flex;gap:8px;align-items:center;font-weight:600}
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+  backdrop-filter:blur(5px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:100;
+}
+.modal.open{display:flex}
+.modalbox{
+  background:#fff;
+  border-radius:10px;
+  width:min(980px,100%);
+  max-height:90vh;
+  overflow:auto;
+  padding:22px;
+  box-shadow:0 30px 80px rgba(0,0,0,.25);
+}
+.themegrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.theme{
+  border:1px solid #ddd;
+  border-radius:8px;
+  padding:10px;
+  background:#fff;
+  cursor:pointer;
+  text-align:left;
+}
+.swatches{display:flex;height:35px}
+.swatches i{flex:1}
+.muted{color:#6b7280}
+.pm-toolbar{display:grid;grid-template-columns:1.4fr .8fr .8fr auto;gap:10px;align-items:end}
+.pm-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.pm-kpi{
+  padding:15px 16px;
+  border:1px solid #e7eaf0;
+  border-radius:10px;
+  background:#fff;
+}
+.pm-kpi strong{display:block;font-size:22px;margin-top:5px}
+.pm-empty{text-align:center;padding:42px;color:#778195}
+.status{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:5px 9px;
+  border-radius:999px;
+  background:#eefbf3;
+  color:#16794b;
+  font-size:11px;
+  font-weight:750;
+}
+.status.off{background:#f1f3f6;color:#667085}
+.type-pill{
+  display:inline-block;
+  padding:5px 8px;
+  border-radius:7px;
+  background:#f4f6f8;
+  color:#475467;
+  font-size:11px;
+  font-weight:700;
+}
+
+.photo-manager{border:1px solid #e5e7eb;border-radius:10px;padding:14px;background:#fafafa}
+.photo-manager-head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.photo-upload{display:inline-flex;align-items:center;gap:8px}
+.photo-upload input{display:none}
+.photo-upload label{cursor:pointer}
+.photo-preview{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px;margin-top:12px}
+.photo-item{position:relative;border:1px solid #e5e7eb;border-radius:8px;background:#fff;padding:5px}
+.photo-item img{display:block;width:100%;height:100px;object-fit:cover;border-radius:6px}
+.photo-item small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:5px;color:#667085;font-size:10px}
+.photo-item button{position:absolute;right:7px;top:7px;border:0;background:rgba(17,24,39,.82);color:#fff;width:24px;height:24px;border-radius:50%;cursor:pointer;line-height:24px;padding:0}
+.photo-item .photo-index{position:absolute;left:7px;top:7px;background:rgba(255,255,255,.92);color:#111827;font-weight:800;border-radius:5px;padding:2px 5px;font-size:10px}
+
+.product-name{font-weight:750}
+.product-meta{font-size:11px;color:#8a94a6;margin-top:3px}
+
+@media(max-width:900px){
+  .side{position:static;width:100%;min-height:auto}
+  .app{display:block}
+  .main{margin-left:0;width:100%;min-height:0}
+  .nav{grid-template-columns:repeat(2,1fr)}
+  .grid,.themegrid{grid-template-columns:1fr 1fr}
+  .two,.pm-toolbar,.pm-kpis{grid-template-columns:1fr 1fr}
+  #views{padding:16px}
+}
+@media(max-width:560px){
+  .nav{grid-template-columns:1fr}
+  .grid,.themegrid,.two,.pm-toolbar,.pm-kpis{grid-template-columns:1fr}
+  .toolbar{align-items:flex-start;flex-direction:column}
+  .top{padding:14px}
+  #views{padding:14px}
+}
+</style><style>
+/* Color swatches: make white/light colors visible on white backgrounds */
+.color-swatch, .swatch, .color-option, [data-color-swatch]{
+  position:relative !important;
+  box-sizing:border-box !important;
+  border:2px solid #9ca3af !important;
+  outline:1px solid rgba(0,0,0,.12);
+  box-shadow:0 1px 3px rgba(0,0,0,.14);
+}
+.color-swatch::before, .swatch::before, .color-option::before, [data-color-swatch]::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  background-image:linear-gradient(45deg,#d1d5db 25%,transparent 25%),
+                    linear-gradient(-45deg,#d1d5db 25%,transparent 25%),
+                    linear-gradient(45deg,transparent 75%,#d1d5db 75%),
+                    linear-gradient(-45deg,transparent 75%,#d1d5db 75%);
+  background-size:8px 8px;
+  background-position:0 0,0 4px,4px -4px,-4px 0;
+  z-index:-1;
+}
+.color-swatch[style*="white"], .swatch[style*="white"],
+.color-option[style*="white"], [data-color-swatch][style*="white"],
+.color-swatch[style*="#fff"], .swatch[style*="#fff"],
+.color-option[style*="#fff"], [data-color-swatch][style*="#fff"],
+.color-swatch[style*="#ffffff"], .swatch[style*="#ffffff"],
+.color-option[style*="#ffffff"], [data-color-swatch][style*="#ffffff"]{
+  border-color:#6b7280 !important;
+  box-shadow:inset 0 0 0 2px #fff, 0 1px 4px rgba(0,0,0,.28) !important;
+}
+.color-swatch.active, .color-swatch.selected,
+.swatch.active, .swatch.selected,
+.color-option.active, .color-option.selected,
+[data-color-swatch].active, [data-color-swatch].selected{
+  border-color:#111827 !important;
+  outline:3px solid rgba(37,99,235,.35) !important;
+  box-shadow:0 0 0 2px #fff, 0 0 0 4px #2563eb !important;
+}
+.color-swatch + span, .swatch + span, .color-option + span{
+  color:#111827;
+  font-weight:600;
+}
+</style>
+
+<style>
+.color-preview-visible{
+  display:inline-flex!important; align-items:center!important; justify-content:center!important;
+  width:38px!important; height:38px!important; border-radius:9px!important;
+  border:2px solid #6b7280!important;
+  box-shadow:inset 0 0 0 2px #fff,0 1px 4px rgba(0,0,0,.2)!important;
+  background-color:#fff;
+}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script><style id="v50-auth-style">#wowAdminGate{position:fixed;inset:0;background:#f6f7f9;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px}.wow-gate-card{width:min(420px,100%);background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:28px;box-shadow:0 20px 60px rgba(15,23,42,.12)}.wow-gate-card h2{margin:0 0 6px}.wow-gate-card p{color:#6b7280;font-size:13px;line-height:1.5}.wow-gate-card input{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:8px;margin:7px 0;box-sizing:border-box}.wow-gate-card button{width:100%;padding:12px;border:0;border-radius:8px;background:#111827;color:#fff;font-weight:700;margin-top:8px;cursor:pointer}.wow-gate-error{color:#b91c1c;font-size:12px;margin-top:8px}</style></head><body><div id="wowAdminGate"><div class="wow-gate-card"><h2>WOWSHOPPING Admin</h2><p>Secure admin access. Only Firebase users with the <b>admin</b> custom claim can enter this panel.</p><input id="wowAdminEmail" type="email" placeholder="Admin email" autocomplete="username"><input id="wowAdminPass" type="password" placeholder="Admin password" autocomplete="current-password"><button onclick="wowAdminLogin()">Secure Sign In</button><div id="wowAdminErr" class="wow-gate-error"></div></div></div><script>
+const WOW_ADMIN_FIREBASE={apiKey:"AIzaSyD2fVt7kfp4ejq_ZLOePpbJrUNWmqGiy4E",authDomain:"wowshopping-cd8bd.firebaseapp.com",projectId:"wowshopping-cd8bd",storageBucket:"wowshopping-cd8bd.firebasestorage.app",messagingSenderId:"10260376614",appId:"1:10260376614:web:0039163b0e355289210ae7",measurementId:"G-3FK3BFZNRG"};
+let wowAdminAuth=null,wowAdminDb=null;
+function wowAdminReady(){return Object.values(WOW_ADMIN_FIREBASE).every(v=>v&&!String(v).startsWith('YOUR_'))}
+function wowAdminBoot(){try{if(!wowAdminReady()){document.getElementById('wowAdminErr').textContent='Add the same Firebase Web App config to this admin.html file.';return}if(!firebase.apps.length)firebase.initializeApp(WOW_ADMIN_FIREBASE);wowAdminAuth=firebase.auth();wowAdminDb=firebase.firestore();wowAdminAuth.onAuthStateChanged(async u=>{if(!u)return;try{const t=await u.getIdTokenResult(true);if(t.claims.admin===true){document.getElementById('wowAdminGate').style.display='none';window.wowAdminUser=u}else{document.getElementById('wowAdminErr').textContent='This account is not authorized as an admin.';await wowAdminAuth.signOut()}}catch(e){document.getElementById('wowAdminErr').textContent='Admin authorization check failed.'}})}catch(e){document.getElementById('wowAdminErr').textContent='Firebase initialization failed.'}}
+async function wowAdminLogout(){try{await wowAdminAuth?.signOut();location.reload()}catch(e){console.error(e)}}
+async function wowAdminLogin(){if(!wowAdminAuth){document.getElementById('wowAdminErr').textContent='Firebase is not configured.';return}const email=document.getElementById('wowAdminEmail').value.trim(),pass=document.getElementById('wowAdminPass').value;if(!email||!pass){document.getElementById('wowAdminErr').textContent='Enter email and password.';return}try{await wowAdminAuth.signInWithEmailAndPassword(email,pass)}catch(e){document.getElementById('wowAdminErr').textContent='Invalid admin credentials.'}}
+window.addEventListener('beforeunload',()=>{});wowAdminBoot();
+</script><div class="app"><aside class="side"><div class="brand">WOWSHOPPING<br><small style="font-size:11px;color:#94a3b8">ADMIN PANEL</small></div><div class="nav" id="nav"></div></aside><main class="main"><div class="top"><div><h1 id="title" style="margin:0">Dashboard</h1><div class="muted">Changes save to this browser and the storefront uses the same data.</div></div><div style="display:flex;gap:8px;align-items:center"><button class="btn" onclick="location.href='index.html'">Open Store</button><button class="btn" onclick="wowAdminLogout()">Sign Out</button></div></div><div id="views"></div></main></div><div id="modal" class="modal"><div class="modalbox" id="modalbox"></div></div><script>
+const KEY='wow_admin_data_v4';const SEED={"hero": {"mediaType": "image", "videoUrl": "", "images": ["https://images.pexels.com/photos/39457480/pexels-photo-39457480.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=400"], "eyebrow": "NEW COLLECTION", "title": "Discover Your Style", "subtitle": "Premium products. Modern shopping.", "buttonText": "Shop Collection", "buttonUrl": "#shop", "button2Text": "New Arrivals", "button2Url": "#shop", "visible": true}, "banners": [{"id": "b1", "title": "Women's Collection", "desktop": "https://images.pexels.com/photos/4983474/pexels-photo-4983474.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=500&w=900", "mobile": "", "description": "Style that speaks.", "button": "Shop Women", "url": "#shop", "category": "Women", "position": "mid", "visible": true, "order": 1}, {"id": "b2", "title": "Men's Collection", "desktop": "https://images.pexels.com/photos/15568482/pexels-photo-15568482.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=500&w=900", "mobile": "", "description": "Redefine elegance.", "button": "Shop Men", "url": "#shop", "category": "Men", "position": "mid", "visible": true, "order": 2}, {"id": "b3", "title": "New Arrivals", "desktop": "https://images.pexels.com/photos/5868722/pexels-photo-5868722.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=500&w=900", "mobile": "", "description": "Fresh styles for every day.", "button": "Explore", "url": "#shop", "category": "New", "position": "mid", "visible": true, "order": 3}], "categories": [{"id": "c1", "name": "Men", "description": "Men collection", "image": "https://images.pexels.com/photos/39457480/pexels-photo-39457480.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=400", "parent": "", "visible": true}, {"id": "c2", "name": "Women", "description": "Women collection", "image": "https://images.pexels.com/photos/39457562/pexels-photo-39457562.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=400", "parent": "", "visible": true}, {"id": "c3", "name": "Kids", "description": "Kids collection", "image": "https://images.pexels.com/photos/8346261/pexels-photo-8346261.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=400", "parent": "", "visible": true}, {"id": "c4", "name": "Accessories", "description": "Accessories collection", "image": "https://images.pexels.com/photos/5717978/pexels-photo-5717978.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=400", "parent": "", "visible": true}], "menu": [{"id": "m1", "title": "Home", "url": "#home", "parent": null, "visible": true}, {"id": "m2", "title": "Shop", "url": "#shop", "parent": null, "visible": true}, {"id": "m3", "title": "New Arrivals", "url": "#shop", "parent": null, "visible": true}, {"id": "m4", "title": "Customer Care", "url": "#care", "parent": null, "visible": true}], "theme": {"primary": "#2563eb", "background": "#ffffff", "text": "#111827", "header": "#ffffff", "footer": "#111827", "sale": "#dc2626", "card": "#ffffff", "muted": "#6b7280", "badge": "#2563eb"}, "branding": {"name": "WOWSHOPPING.lk", "title": "WOWSHOPPING.lk", "logo": "", "icon": "", "favicon": "", "footer": "Premium online shopping experience."}, "shipping": {"standard": 350, "express": 650}, "products": [{"id": "1", "name": "Premium Cotton T-Shirt", "category": "Men", "subcat": "T-Shirts", "price": 1850, "salePrice": 1490, "discount": 19, "rating": 0, "reviews": 0, "stock": 45, "sku": "MEN-TS-001", "isNew": true, "isBest": false, "sizes": ["S", "M", "L", "XL", "XXL"], "colors": ["Black", "White", "Navy"], "images": ["https://images.pexels.com/photos/39457480/pexels-photo-39457480.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=400", "https://images.pexels.com/photos/8346029/pexels-photo-8346029.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=400"], "desc": "Premium quality 100% cotton T-Shirt with superior fabric feel and lasting comfort.", "visible": true, "brand": "WOWSHOPPING", "material": "Premium", "gender": "Men", "fit": "Regular", "costPrice": 1018, "highlights": ["Quality checked", "Island-wide delivery"], "tags": ["Men", "T-Shirts"], "variantStock": {}}, {"id": "2", "name": "Classic Oxford Shirt", "category": "Men", "subcat": "Shirts", "price": 3200, "salePrice": 2650, "discount": 17, "rating": 0, "reviews": 0, "stock": 23, "sku": "MEN-SH-001", "isNew": false, "isBest": true, "sizes": ["S", "M", "L", "XL"], "colors": ["White", "Light Blue", "Pink"], "images": ["https://images.pexels.com/photos/8346261/pexels-photo-8346261.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=400", "https://images.pexels.com/photos/8346029/pexels-photo-8346029.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=400"], "desc": "A timeless classic Oxford shirt crafted from premium breathable fabric.", "visible": true, "brand": "WOWSHOPPING", "material": "Premium", "gender": "Men", "fit": "Regular", "costPrice": 1760, "highlights": ["Quality checked", "Island-wide delivery"], "tags": ["Men", "Shirts"], "variantStock": {}}, {"id": "3", "name": "Slim Fit Chino Pants", "category": "Men", "subcat": "Pants", "price": 4500, "salePrice": 3800, "discount": 16, "rating": 0, "reviews": 0, "stock": 18, "sku": "MEN-PT-001", "isNew": false, "isBest": false, "sizes": ["28", "30", "32", "34", "36"], "colors": ["Khaki", "Navy", "Black", "Olive"], "images": ["https://images.pexels.com/photos/39457757/pexels-photo-39457757.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=400"], "desc": "Modern slim fit chino pants, perfect for both casual and smart-casual occasions.", "visible": true, "brand": "WOWSHOPPING", "material": "Premium", "gender": "Men", "fit": "Regular", "costPrice": 2475, "highlights": ["Quality checked", "Island-wide delivery"], "tags": ["Men", "Pants"], "variantStock": {}}, {"id": "4", "name": "Women's Floral Midi Dress", "category": "Women", "subcat": "Dresses", "price": 5200, "salePrice": 4100, "discount": 21, "rating": 0, "reviews": 0, "stock": 31, "sku": "WOM-DR-001", "isNew": true, "isBest": true, "sizes": ["XS", "S", "M", "L", "XL"], "colors": ["Floral Red", "Floral Blue", "Floral Green"], "images": ["https://images.pexels.com/photos/39457562/pexels-photo-39457562.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=400", "https://images.pexels.com/photos/39457750/pexels-photo-39457750.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=400"], "desc": "Elegant floral midi dress with a flattering silhouette for any occasion.", "visible": true, "brand": "WOWSHOPPING", "material": "Premium", "gender": "Women", "fit": "Regular", "costPrice": 2860, "highlights": ["Quality checked", "Island-wide delivery"], "tags": ["Women", "Dresses"], "variantStock": {}}, {"id": "5", "name": "Essential Ribbed Top", "category": "Women", "subcat": "Tops", "price": 2100, "salePrice": 1650, "discount": 21, "rating": 0, "reviews": 0, "stock": 67, "sku": "WOM-TP-001", "isNew": true, "isBest": false, "sizes": ["XS", "S", "M", "L"], "colors": ["White", "Black", "Beige", "Sage"], "images": ["https://images.pexels.com/photos/39457513/pexels-photo-39457513.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=400"], "desc": "Versatile ribbed top that pairs effortlessly with any bottom.", "visible": true, "brand": "WOWSHOPPING", "material": "Premium", "gender": "Women", "fit": "Regular", "costPrice": 1155, "highlights": ["Quality checked", "Island-wide delivery"], "tags": ["Women", "Tops"], "variantStock": {}}, {"id": "6", "name": "High-Waist Wide Leg Pants", "category": "Women", "subcat": "Bottoms", "price": 3800, "salePrice": 3100, "discount": 18, "rating": 0, "reviews": 0, "stock": 29, "sku": "WOM-BT-001", "isNew": false, "isBest": true, "sizes": ["XS", "S", "M", "L", "XL"], "colors": ["Black", "Camel", "White"], "images": ["https://images.pexels.com/photos/39457735/pexels-photo-39457735.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=400"], "desc": "Sophisticated wide leg pants with a flattering high waist cut.", "visible": true, "brand": "WOWSHOPPING", "material": "Premium", "gender": "Women", "fit": "Regular", "costPrice": 2090, "highlights": ["Quality checked", "Island-wide delivery"], "tags": ["Women", "Bottoms"], "variantStock": {}}, {"id": "7", "name": "Boys Graphic Tee Set", "category": "Kids", "subcat": "Boys", "price": 1600, "salePrice": 1200, "discount": 25, "rating": 0, "reviews": 0, "stock": 52, "sku": "KID-BT-001", "isNew": true, "isBest": false, "sizes": ["2-3Y", "4-5Y", "6-7Y", "8-9Y", "10-11Y"], "colors": ["Blue", "Red", "Green"], "images": ["https://images.pexels.com/photos/8346261/pexels-photo-8346261.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=400"], "desc": "Fun and durable graphic tee set perfect for active boys.", "visible": true, "brand": "WOWSHOPPING", "material": "Premium", "gender": "Kids", "fit": "Regular", "costPrice": 880, "highlights": ["Quality checked", "Island-wide delivery"], "tags": ["Kids", "Boys"], "variantStock": {}}, {"id": "8", "name": "Girls Ruffle Dress", "category": "Kids", "subcat": "Girls", "price": 2400, "salePrice": 1900, "discount": 21, "rating": 0, "reviews": 0, "stock": 41, "sku": "KID-GD-001", "isNew": false, "isBest": true, "sizes": ["2-3Y", "4-5Y", "6-7Y", "8-9Y"], "colors": ["Pink", "Lavender", "Yellow"], "images": ["https://images.pexels.com/photos/39457562/pexels-photo-39457562.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=400"], "desc": "Adorable ruffle dress that makes every little girl feel like a princess.", "visible": true, "brand": "WOWSHOPPING", "material": "Premium", "gender": "Kids", "fit": "Regular", "costPrice": 1320, "highlights": ["Quality checked", "Island-wide delivery"], "tags": ["Kids", "Girls"], "variantStock": {}}, {"id": "9", "name": "Leather Crossbody Bag", "category": "Accessories", "subcat": "Bags", "price": 7500, "salePrice": 5990, "discount": 20, "rating": 0, "reviews": 0, "stock": 15, "sku": "ACC-BG-001", "isNew": false, "isBest": true, "sizes": ["One Size"], "colors": ["Black", "Brown", "Tan"], "images": ["https://images.pexels.com/photos/5717978/pexels-photo-5717978.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=400"], "desc": "Genuine leather crossbody bag with multiple compartments and adjustable strap.", "visible": true, "brand": "WOWSHOPPING", "material": "Premium", "gender": "Unisex", "fit": "Regular", "costPrice": 4125, "highlights": ["Quality checked", "Island-wide delivery"], "tags": ["Accessories", "Bags"], "variantStock": {}}, {"id": "10", "name": "Classic Analog Watch", "category": "Accessories", "subcat": "Watches", "price": 12500, "salePrice": 9800, "discount": 22, "rating": 0, "reviews": 0, "stock": 8, "sku": "ACC-WT-001", "isNew": true, "isBest": true, "sizes": ["One Size"], "colors": ["Silver", "Gold", "Rose Gold"], "images": ["https://images.pexels.com/photos/15942328/pexels-photo-15942328.png?auto=compress&cs=tinysrgb&fit=crop&h=600&w=400"], "desc": "Elegant timepiece with Japanese movement and sapphire crystal glass.", "visible": true, "brand": "WOWSHOPPING", "material": "Premium", "gender": "Unisex", "fit": "Regular", "costPrice": 6875, "highlights": ["Quality checked", "Island-wide delivery"], "tags": ["Accessories", "Watches"], "variantStock": {}}, {"id": "11", "name": "Canvas Sneakers", "category": "Accessories", "subcat": "Shoes", "price": 4200, "salePrice": 3500, "discount": 17, "rating": 0, "reviews": 0, "stock": 34, "sku": "ACC-SH-001", "isNew": true, "isBest": false, "sizes": ["37", "38", "39", "40", "41", "42", "43", "44"], "colors": ["White", "Black", "Navy"], "images": ["https://images.pexels.com/photos/39457504/pexels-photo-39457504.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=400"], "desc": "Timeless canvas sneakers with cushioned insole for all-day comfort.", "visible": true, "brand": "WOWSHOPPING", "material": "Premium", "gender": "Unisex", "fit": "Regular", "costPrice": 2310, "highlights": ["Quality checked", "Island-wide delivery"], "tags": ["Accessories", "Shoes"], "variantStock": {}}, {"id": "12", "name": "Women's Premium Hoodie", "category": "Women", "subcat": "Tops", "price": 4800, "salePrice": 3900, "discount": 19, "rating": 0, "reviews": 0, "stock": 22, "sku": "WOM-HD-001", "isNew": false, "isBest": false, "sizes": ["XS", "S", "M", "L", "XL"], "colors": ["Grey", "Black", "Dusty Pink"], "images": ["https://images.pexels.com/photos/8346261/pexels-photo-8346261.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=400"], "desc": "Cozy premium hoodie with fleece lining and kangaroo pocket.", "visible": true, "brand": "WOWSHOPPING", "material": "Premium", "gender": "Women", "fit": "Regular", "costPrice": 2640, "highlights": ["Quality checked", "Island-wide delivery"], "tags": ["Women", "Tops"], "variantStock": {}}]};let d=load();d.products=(d.products||[]).map(p=>{const reviews=Array.isArray(p.reviewList)?p.reviewList.filter(r=>r&&r.verifiedPurchase===true):[];const rating=reviews.length?Math.round((reviews.reduce((a,r)=>a+Number(r.rating||0),0)/reviews.length)*10)/10:0;return {...p,reviewList:reviews,rating,reviews:reviews.length,productVideo:p.productVideo||'',badge:p.badge||'None',barcode:p.barcode||'',occasion:p.occasion||'',care:p.care||'',origin:p.origin||'',warranty:p.warranty||'',waterResistance:p.waterResistance||'',shippingInfo:p.shippingInfo||'',returnPolicy:p.returnPolicy||'',relatedProducts:Array.isArray(p.relatedProducts)?p.relatedProducts:[]};});
+function ensureCategoryDefaults(target){
+  target.categories=Array.isArray(target.categories)?target.categories:[];
+  const defs=[{id:"cat1",name:"Shoes",description:"Shoe collection",image:"https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=600",parent:"",visible:true,filterLabel:"Shoe Size",filterOptions:["35","36","37","38","39","40","41","42","43","44","45","46"]},
+{id:"cat2",name:"Jewellery",description:"Jewellery collection",image:"https://images.pexels.com/photos/1191531/pexels-photo-1191531.jpeg?auto=compress&cs=tinysrgb&w=600",parent:"",visible:true,filterLabel:"Jewellery Type",filterOptions:["Ring","Necklace","Bracelet","Earrings","Chain","Pendant"]},
+{id:"cat3",name:"Caps",description:"Caps collection",image:"https://images.pexels.com/photos/1124465/pexels-photo-1124465.jpeg?auto=compress&cs=tinysrgb&w=600",parent:"",visible:true,filterLabel:"Cap Type",filterOptions:["Baseball","Snapback","Trucker","Bucket","Beanie"]},
+{id:"cat4",name:"Watches",description:"Watches collection",image:"https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?auto=compress&cs=tinysrgb&w=600",parent:"",visible:true,filterLabel:"Watch Type",filterOptions:["Analog","Digital","Smart Watch","Sports Watch"]},
+{id:"cat5",name:"Bands",description:"Bands collection",image:"https://images.pexels.com/photos/437037/pexels-photo-437037.jpeg?auto=compress&cs=tinysrgb&w=600",parent:"",visible:true,filterLabel:"Band Type",filterOptions:["Wrist Band","Fitness Band","Leather Band","Metal Band"]},
+{id:"cat6",name:"Accessories",description:"Accessories collection",image:"https://images.pexels.com/photos/1152077/pexels-photo-1152077.jpeg?auto=compress&cs=tinysrgb&w=600",parent:"",visible:true,filterLabel:"Accessory Type",filterOptions:["Belt","Wallet","Bag","Sunglasses","Other"]},
+{id:"cat7",name:"Men",description:"Men collection",image:"https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg?auto=compress&cs=tinysrgb&w=600",parent:"",visible:true,filterLabel:"Men Size",filterOptions:["S","M","L","XL","XXL","XXXL"]},
+{id:"cat8",name:"Women",description:"Women collection",image:"https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=600",parent:"",visible:true,filterLabel:"Women Size",filterOptions:["XS","S","M","L","XL","XXL"]},
+{id:"cat9",name:"Kids",description:"Kids collection",image:"https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=600",parent:"",visible:true,filterLabel:"Kids Size",filterOptions:["2Y","4Y","6Y","8Y","10Y","12Y","14Y"]}];
+  defs.forEach(def=>{
+    let c=target.categories.find(x=>String(x.name||'').trim().toLowerCase()===def.name.toLowerCase());
+    if(!c){ c={...def,id:def.id}; target.categories.push(c); }
+    else{ c.filterLabel=c.filterLabel||def.filterLabel; c.filterOptions=Array.isArray(c.filterOptions)&&c.filterOptions.length?c.filterOptions:def.filterOptions; c.image=c.image||def.image; c.description=c.description||def.description; c.visible=c.visible!==false; }
+  });
+  // Keep existing category edits, but move the sample Shoes/Watches products into their own categories.
+  (target.products||[]).forEach(p=>{
+    const sub=String(p.subcat||'').trim().toLowerCase();
+    if(String(p.category||'').toLowerCase()==='accessories' && sub==='shoes') p.category='Shoes';
+    if(String(p.category||'').toLowerCase()==='accessories' && sub==='watches') p.category='Watches';
+  });
+  const catMenuId='cat-menu-root';
+  let root=target.menu?.find(x=>x.id===catMenuId);
+  if(!root){ root={id:catMenuId,title:'Categories',url:'#shop',parent:null,visible:true}; target.menu=target.menu||[]; target.menu.push(root); }
+  defs.forEach(def=>{
+    const id='cat-menu-'+def.name.toLowerCase().replace(/[^a-z0-9]+/g,'-');
+    if(!target.menu.find(x=>x.id===id)) target.menu.push({id,title:def.name,url:'#shop',category:def.name,parent:catMenuId,visible:true});
+  });
+}
+ensureCategoryDefaults(d);
+
+d.settings=d.settings||{showShopAll:false,adminEmail:'',requireFirebase:true};
+d.footer=d.footer||{visible:true,description:'',copyright:'',payments:[{name:'VISA',visible:true},{name:'MASTERCARD',visible:true},{name:'COD',visible:true}],secureText:'Secure Shopping',sections:[{id:'shop',title:'Shopping',visible:true,links:[{label:'New Arrivals',url:'#shop',visible:true},{label:'Sale',url:'#shop',visible:true}]},{id:'care',title:'Customer Care',visible:true,links:[{label:'Contact Us',url:'#care',visible:true},{label:'Order Tracking',url:'#tracking',visible:true},{label:'FAQ',url:'#care',visible:true}]},{id:'company',title:'Company',visible:true,links:[{label:'About Us',url:'#about',visible:true},{label:'Privacy Policy',url:'#privacy',visible:true},{label:'Terms & Conditions',url:'#terms',visible:true}]}]};
+d.care=d.care||{cards:[{id:'care1',title:'Call Us',text:'Mon - Sat, 9AM - 6PM',value:'Call Now',href:'tel:+94112345678',visible:true},{id:'care2',title:'WhatsApp',text:'Quick response',value:'Chat Now',href:'https://wa.me/94112345678',visible:true},{id:'care3',title:'Help Center',text:'Find answers',value:'Open Help',href:'#care',visible:true}]};
+d.benefits=d.benefits||{visible:true,cards:[{id:'benefit1',icon:'truck',title:'Free Delivery',text:'On orders over Rs. 3,000',visible:true},{id:'benefit2',icon:'refresh-ccw',title:'Easy Exchange',text:'Hassle-free within 7 days',visible:true},{id:'benefit3',icon:'shield-check',title:'Secure Payments',text:'100% safe & encrypted',visible:true},{id:'benefit4',icon:'headphones',title:'24/7 Support',text:'Ready to help anytime',visible:true}]};
+d.promise=d.promise||{visible:true,label:'Our Promise',title:'Why Shop With Us?',description:"We've built WOWSHOPPING around one goal — making you look and feel your best, effortlessly.",cards:[{id:'promise1',icon:'zap',title:'Lightning Fast Delivery',text:'Order today, receive in 2-4 working days. Express delivery available across Sri Lanka.',visible:true},{id:'promise2',icon:'badge-check',title:'100% Authentic Products',text:'Every product is quality-checked and authenticated before it reaches your doorstep.',visible:true},{id:'promise3',icon:'heart',title:'Customer-First Always',text:'Our team is here 7 days a week to assist you with any questions or concerns.',visible:true}]};
+d.promise.cards=(d.promise.cards||[]).map((x,i)=>({...x,id:x.id||'promise'+(i+1),icon:x.icon||'star',title:x.title||'',text:x.text||'',visible:x.visible!==false}));
+d.benefits.cards=(d.benefits.cards||[]).map((x,i)=>({...x,id:x.id||'benefit'+(i+1),icon:x.icon||'star',title:x.title||'',text:x.text||'',visible:x.visible!==false}));
+d.care.cards=(d.care.cards||[]).map((x,i)=>({...x,id:x.id||id('care'),visible:x.visible!==false}));
+d.banners=(d.banners||[]).map((x,i)=>({...x,id:x.id||id('b'),order:x.order||i+1,visible:x.visible!==false}));
+d.menu=(d.menu||[]).map((x,i)=>({...x,id:x.id||id('m'),parent:x.parent||null,visible:x.visible!==false}));
+if(!d.branding) d.branding={name:'WOWSHOPPING',title:'WOWSHOPPING',logo:'',icon:'',favicon:'',footer:''};
+d.branding.icon=d.branding.icon||''; d.branding.favicon=d.branding.favicon||'';
+function load(){try{const x=JSON.parse(localStorage.getItem(KEY)||'null');return x?merge(structuredClone(SEED),x):structuredClone(SEED)}catch(e){return structuredClone(SEED)}}function save(){localStorage.setItem(KEY,JSON.stringify(d));render();window.dispatchEvent(new StorageEvent('storage',{key:KEY}));toast('Saved')}
+function merge(a,b){for(const k in b){if(b[k]&&typeof b[k]==='object'&&!Array.isArray(b[k])&&a[k])a[k]=merge(a[k],b[k]);else a[k]=b[k]}return a}function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}function id(p){return p+Date.now().toString(36)+Math.random().toString(36).slice(2,5)}function toast(x){alert(x)}
+const sections=['dashboard','products','customers','categories','menu','hero','banners','benefits','promise','theme','branding','care','footer','shipping','payments','settings'];const labels={dashboard:'Dashboard',products:'Product Manager',customers:'Customers' ,categories:'Categories',menu:'Menu Manager',hero:'Hero / Video',banners:'3 Banner Carousel',benefits:'Benefits Bar',promise:'Our Promise',theme:'Theme Manager',branding:'Branding',care:'Customer Care',footer:'Footer Manager',shipping:'Shipping',payments:'Payments',settings:'Settings'};let current='dashboard';
+function boot(){document.getElementById('nav').innerHTML=sections.map(s=>`<button data-s="${s}" onclick="show('${s}')">${labels[s]}</button>`).join('');document.getElementById('views').innerHTML=sections.map(s=>`<section class="view" id="v-${s}"></section>`).join('');show('dashboard')}
+function show(s){current=s;document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.s===s));const target=document.getElementById('v-'+s);if(!target)return;target.classList.add('active');document.getElementById('title').textContent=labels[s]||s;render();if(s==='promise'&&typeof promise==='function'){promise()}}
+async function payments(){
+ const el=v('payments');
+ let cfg={enabled:{payhere:true,bank:true,cod:true},payhere:{merchantId:'',mode:'live',returnUrl:''},bank:{bankName:'',accountName:'',accountNumber:'',branch:'',instructions:''},cod:{fee:0,instructions:'Pay cash when your order arrives.'}};
+ try{const snap=await wowAdminDb.collection('siteConfig').doc('paymentSettings').get();if(snap.exists)cfg={...cfg,...snap.data(),enabled:{...cfg.enabled,...(snap.data().enabled||{})},payhere:{...cfg.payhere,...(snap.data().payhere||{})},bank:{...cfg.bank,...(snap.data().bank||{})},cod:{...cfg.cod,...(snap.data().cod||{})}}}catch(e){console.error(e)}
+ let secretStatus={hasSecret:false};
+ try{const u=await wowAdminAuth.currentUser; if(u){const token=await u.getIdToken(true);const r=await fetch((window.WOW_AUTH_API_BASE||'https://asia-south1-wowshopping-cd8bd.cloudfunctions.net')+'/getPayHereCredentialStatus',{headers:{Authorization:'Bearer '+token}});if(r.ok)secretStatus=await r.json()}}catch(e){console.error(e)}
+ el.innerHTML=`<div class="card"><div class="toolbar"><div><h3 style="margin:0">Payment Settings</h3><div class="muted">Configure real customer payment methods. PayHere credentials are sent only to the secure backend and the Merchant Secret is never displayed back in the browser.</div></div></div>
+ <div class="card form"><h3> Visa / Mastercard — PayHere</h3><label class="switch"><input id="pay_ph_on" type="checkbox" ${cfg.enabled.payhere!==false?'checked':''}> Enable PayHere</label>
+ <div class="two"><div class="field"><label>PayHere Merchant ID</label><input id="pay_ph_mid" value="${esc(cfg.payhere.merchantId||'')}" placeholder="Merchant ID from PayHere"></div><div class="field"><label>Environment</label><select id="pay_ph_mode"><option value="live" ${cfg.payhere.mode==='live'?'selected':''}>Live</option><option value="sandbox" ${cfg.payhere.mode==='sandbox'?'selected':''}>Sandbox / Testing</option></select></div></div>
+ <div class="field"><label>PayHere Merchant Secret</label><input id="pay_ph_secret" type="password" autocomplete="new-password" placeholder="Paste the Merchant Secret from PayHere"></div>
+ <div class="field"><label>Return URL (optional)</label><input id="pay_ph_ret" value="${esc(cfg.payhere.returnUrl||'')}" placeholder="https://your-live-domain.com/"></div>
+ <div class="muted" style="margin-top:8px">${secretStatus.hasSecret?' Merchant Secret is already saved securely on the backend. Enter a new one only if you need to replace it.':' Merchant Secret has not been saved yet.'} PayHere requires a public notify URL and server-side payment verification.</div></div>
+ <div class="card form"><h3> Bank Transfer</h3><label class="switch"><input id="pay_bank_on" type="checkbox" ${cfg.enabled.bank!==false?'checked':''}> Enable Bank Transfer</label><div class="two"><div class="field"><label>Bank Name</label><input id="pay_bname" value="${esc(cfg.bank.bankName||'')}"></div><div class="field"><label>Account Name</label><input id="pay_bacctname" value="${esc(cfg.bank.accountName||'')}"></div></div><div class="two"><div class="field"><label>Account Number</label><input id="pay_bacct" value="${esc(cfg.bank.accountNumber||'')}"></div><div class="field"><label>Branch</label><input id="pay_branch" value="${esc(cfg.bank.branch||'')}"></div></div><div class="field"><label>Customer Instructions</label><textarea id="pay_binst" rows="3">${esc(cfg.bank.instructions||'')}</textarea></div></div>
+ <div class="card form"><h3> Cash on Delivery</h3><label class="switch"><input id="pay_cod_on" type="checkbox" ${cfg.enabled.cod!==false?'checked':''}> Enable COD</label><div class="field"><label>COD Fee (LKR)</label><input id="pay_cod_fee" type="number" min="0" value="${Number(cfg.cod.fee||0)}"></div><div class="field"><label>Customer Instructions</label><textarea id="pay_cod_inst" rows="2">${esc(cfg.cod.instructions||'Pay cash when your order arrives.')}</textarea></div></div>
+ <button class="btn primary" onclick="savePayments()">Save Payment Settings</button></div>`;
+}
+async function savePayments(){
+ const mid=document.getElementById('pay_ph_mid').value.trim(), secret=document.getElementById('pay_ph_secret').value.trim(), mode=document.getElementById('pay_ph_mode').value, ret=document.getElementById('pay_ph_ret').value.trim();
+ const enabled={payhere:document.getElementById('pay_ph_on').checked,bank:document.getElementById('pay_bank_on').checked,cod:document.getElementById('pay_cod_on').checked};
+ const cfg={enabled,payhere:{merchantId:mid,mode,returnUrl:ret},bank:{bankName:document.getElementById('pay_bname').value.trim(),accountName:document.getElementById('pay_bacctname').value.trim(),accountNumber:document.getElementById('pay_bacct').value.trim(),branch:document.getElementById('pay_branch').value.trim(),instructions:document.getElementById('pay_binst').value.trim()},cod:{fee:Number(document.getElementById('pay_cod_fee').value||0),instructions:document.getElementById('pay_cod_inst').value.trim()}};
+ try{
+   if(enabled.payhere && (!mid || !secret)){toast('PayHere requires Merchant ID and Merchant Secret','error');return;}
+   await wowAdminDb.collection('siteConfig').doc('paymentSettings').set(cfg,{merge:true});
+   if(mid && secret){const u=wowAdminAuth.currentUser;if(!u)throw new Error('Admin session expired');const token=await u.getIdToken(true);const r=await fetch((window.WOW_AUTH_API_BASE||'https://asia-south1-wowshopping-cd8bd.cloudfunctions.net')+'/savePayHereCredentials',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({merchantId:mid,merchantSecret:secret,mode,returnUrl:ret,enabled:enabled.payhere,bankEnabled:enabled.bank,codEnabled:enabled.cod})});const j=await r.json();if(!r.ok)throw new Error(j.error||'Could not save PayHere credentials');document.getElementById('pay_ph_secret').value='';}
+   toast('Payment settings saved');
+ }catch(e){console.error(e);toast(e.message||'Could not save payment settings','error')}
+}
+function render(){if(!document.getElementById('v-'+current))return;({dashboard:dash,products:products,customers:customers,categories:categories,menu:menu,hero:hero,banners:banners,benefits:benefits,promise:promise,theme:theme,branding:branding,care:care,footer:footer,shipping:shipping,payments:payments,settings:settings}[current]||dash)()}
+function dash(){v('dashboard').innerHTML=`<div class="grid"><div class="card"><div class="label">Products</div><div class="stat">${d.products.length}</div></div><div class="card"><div class="label">Visible Products</div><div class="stat">${d.products.filter(x=>x.visible!==false).length}</div></div><div class="card"><div class="label">Categories</div><div class="stat">${d.categories.length}</div></div><div class="card"><div class="label">Banners</div><div class="stat">${d.banners.length}</div></div></div><div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div><h3 style="margin:0">Live Customer Presence</h3><p class="muted">Customers active on the storefront during the last 2 minutes.</p></div><button class="btn primary" onclick="loadAdminPresence()">Refresh</button></div><div id="adminPresenceKpi" style="font-size:38px;font-weight:900;margin-top:12px">—</div><div id="adminPresenceList" class="muted">Loading...</div></div><div class="card"><h3>Admin is ready</h3><p class="muted">Use the left menu to manage products, customers, categories, menu, hero, banners, theme, branding and settings.</p></div>`;setTimeout(loadAdminPresence,50)}
+async function loadAdminPresence(){try{const u=wowAdminAuth?.currentUser;if(!u)return;const token=await u.getIdToken(true);const base=(window.WOW_AUTH_API_BASE||'https://asia-south1-wowshopping-cd8bd.cloudfunctions.net').replace(/\/$/,'');const r=await fetch(base+'/listUsers',{headers:{Authorization:'Bearer '+token}});const j=await r.json();if(!r.ok)throw new Error(j.error||'Unable to load presence');const on=(j.users||[]).filter(x=>x.online);const k=document.getElementById('adminPresenceKpi');if(k)k.textContent=String(on.length);const l=document.getElementById('adminPresenceList');if(l)l.innerHTML=on.length?on.slice(0,8).map(x=>`<span style="display:inline-flex;align-items:center;gap:7px;margin:8px 12px 0 0;padding:7px 10px;border:1px solid #dcfce7;background:#f0fdf4;border-radius:999px"><span style="width:8px;height:8px;border-radius:50%;background:#22c55e"></span>${esc(x.name||x.displayName||x.phoneNumber||x.email||'Customer')}</span>`).join(''):'No customers are currently active.'}catch(e){console.error(e);const l=document.getElementById('adminPresenceList');if(l)l.textContent='Unable to load live presence.'}}
+function v(s){return document.getElementById('v-'+s)}
+async function customers(){
+  const el=v('customers');
+  el.innerHTML=`<div class="toolbar"><div><b>Customer Accounts & Live Presence</b><div class="muted">Real Firebase accounts, verification, login provider, profile/address details and live activity.</div></div><button class="btn primary" onclick="loadCustomers()">Refresh Users</button></div><div id="customerKpis" class="pm-kpis" style="margin-bottom:14px"></div><div class="card"><div id="customerList"><div class="muted">Loading customers...</div></div></div>`;
+  await loadCustomers();
+}
+async function loadCustomers(){
+  const el=document.getElementById('customerList'); if(!el)return;
+  try{
+    if(!wowAdminAuth){el.innerHTML='<div class="muted">Admin authentication is not ready.</div>';return}
+    const u=wowAdminAuth.currentUser; if(!u){el.innerHTML='<div class="muted">Please sign in as admin.</div>';return}
+    const token=await u.getIdToken(true);
+    const apiBase=(window.WOW_AUTH_API_BASE||'https://asia-south1-wowshopping-cd8bd.cloudfunctions.net').replace(/\/$/,'');
+    const r=await fetch(apiBase+'/listUsers',{headers:{Authorization:'Bearer '+token}});
+    const j=await r.json(); if(!r.ok)throw new Error(j.error||'Unable to load users');
+    const users=j.users||[]; const online=users.filter(x=>x.online===true).length; const phone=users.filter(x=>x.phoneVerified).length; const google=users.filter(x=>(x.providerData||[]).includes('google.com')).length;
+    const k=document.getElementById('customerKpis'); if(k)k.innerHTML=`<div class="pm-kpi"><span class="label">Total accounts</span><strong>${users.length}</strong></div><div class="pm-kpi"><span class="label">Online now</span><strong style="color:#16a34a">${online}</strong></div><div class="pm-kpi"><span class="label">Phone verified</span><strong>${phone}</strong></div><div class="pm-kpi"><span class="label">Google accounts</span><strong>${google}</strong></div>`;
+    if(!users.length){el.innerHTML='<div class="muted">No registered users yet.</div>';return}
+    const fmt=v=>v?new Date(v).toLocaleString():'—';
+    el.innerHTML=`<div style="overflow:auto"><table class="table"><tr><th>Status</th><th>Customer</th><th>Contact</th><th>Verification</th><th>Address</th><th>Login</th><th>Activity</th><th>Role</th></tr>${users.map(u=>{
+      const providers=(u.providerData||[]).map(x=>x==='google.com'?'Google':x==='password'?'Email':x==='phone'?'Phone':x).filter(Boolean).join(', ')||'—';
+      const address=[u.address,u.addressLine2,u.city,u.district,u.province,u.postalCode,u.country].filter(Boolean).join(', ');
+      const isOnline=!!u.online;
+      return `<tr>
+        <td><div style="display:flex;align-items:center;gap:8px"><span class="wow-online-dot" style="background:${isOnline?'#22c55e':'#cbd5e1'};box-shadow:0 0 0 3px ${isOnline?'#dcfce7':'#f1f5f9'}"></span><span>${isOnline?'Online':'Offline'}</span></div></td>
+        <td><div style="font-weight:700">${esc(u.displayName||u.name||'Customer')}</div><div class="product-meta">${esc(u.email||'—')}<br><small>${esc(u.uid)}</small></div></td>
+        <td><div>${esc(u.phoneNumber||'—')}</div><small>${u.phoneNumber?(u.phoneVerified?'✓ Phone verified':'Phone not verified'):'No phone linked'}</small></td>
+        <td><div>Email: ${u.emailVerified?'✓ Verified':'Not verified'}</div><div>Phone: ${u.phoneVerified?'✓ Verified':'Not verified'}</div></td>
+        <td><div style="max-width:250px;white-space:normal">${esc(address||'No address saved')}</div></td>
+        <td>${esc(providers)}</td>
+        <td><div>Created: ${fmt(u.createdAt)}</div><div>Last login: ${fmt(u.lastSignInAt)}</div><div>Last active: ${fmt(u.lastActiveAt)}</div></td>
+        <td><span class="status ${u.admin?'':'off'}">${u.admin?'Admin':'Customer'}</span></td>
+      </tr>`;
+    }).join('')}</table></div>`;
+  }catch(e){console.error(e);el.innerHTML=`<div style="color:#b91c1c">${esc(e.message||'Unable to load customers.')}</div>`}
+}
+
+
+function products(){
+ const ps=d.products||[]; const visible=ps.filter(p=>p.visible!==false).length; const hidden=ps.length-visible; const low=ps.filter(p=>Number(p.stock||0)>0&&Number(p.stock||0)<=5).length;
+ v('products').innerHTML=`<div class="toolbar"><div><b>Universal Product Manager</b><div class="muted">One premium workspace for clothing, shoes, caps, bags, jewellery, watches and every other product type.</div></div><button class="btn primary" onclick="editProduct()">+ Add Product</button></div>
+ <div class="pm-kpis"><div class="pm-kpi"><span class="label">Total products</span><strong>${ps.length}</strong></div><div class="pm-kpi"><span class="label">Live on store</span><strong>${visible}</strong></div><div class="pm-kpi"><span class="label">Hidden</span><strong>${hidden}</strong></div><div class="pm-kpi"><span class="label">Low stock</span><strong>${low}</strong></div></div>
+ <div class="card"><div class="pm-toolbar"><div class="field"><label>Search</label><input id="pmSearch" placeholder="Name, SKU, brand, category..." oninput="filterProductTable()"></div><div class="field"><label>Department</label><select id="pmFilterDept" onchange="filterProductTable()"><option value="">All</option><option>Kids</option><option>Men</option><option>Women</option><option>Unisex</option><option>Accessories</option></select></div><div class="field"><label>Product type</label><select id="pmFilterType" onchange="filterProductTable()"><option value="">All types</option><option>Clothing</option><option>Shoes</option><option>Caps & Hats</option><option>Bags</option><option>Jewellery</option><option>Watches</option><option>Accessories</option><option>Sportswear</option><option>Beauty</option><option>Home & Lifestyle</option><option>Other</option></select></div><button class="btn" onclick="document.getElementById('pmSearch').value='';document.getElementById('pmFilterDept').value='';document.getElementById('pmFilterType').value='';filterProductTable()">Reset</button></div></div>
+ <div class="card"><div style="overflow:auto"><table class="table" id="pmTable"><tr><th>Product</th><th>Audience</th><th>Type</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr>${ps.map(p=>{const dep=p.department||p.gender||p.category||'';const type=p.productType||p.subcat||'Other';const search=(p.name+' '+(p.sku||'')+' '+(p.brand||'')+' '+(p.category||'')+' '+(p.subcat||'')+' '+type+' '+dep).toLowerCase();return `<tr data-search="${esc(search)}" data-dept="${esc(dep)}" data-type="${esc(type)}"><td><div style="display:flex;gap:12px;align-items:center"><img class="thumb" src="${esc(p.images?.[0]||'')}" onerror="this.style.visibility='hidden'"><div><div class="product-name">${esc(p.name)}</div><div class="product-meta">${esc(p.sku||'No SKU')} ${p.brand?'· '+esc(p.brand):''}</div></div></div></td><td>${esc(dep||'—')}</td><td><span class="type-pill">${esc(type)}</span></td><td><b>Rs. ${Number(p.salePrice||p.price||0).toLocaleString()}</b>${p.salePrice&&p.price&&p.salePrice<p.price?`<div class="product-meta" style="text-decoration:line-through">Rs. ${Number(p.price).toLocaleString()}</div>`:''}</td><td>${Number(p.stock||0).toLocaleString()}</td><td><span class="status ${p.visible===false?'off':''}">${p.visible===false?'Hidden':'Live'}</span></td><td class="actions"><button class="btn" onclick="editProduct('${p.id}')">Edit</button><button class="btn" onclick="toggle('products','${p.id}')">${p.visible===false?'Show':'Hide'}</button><button class="btn danger" onclick="del('products','${p.id}')">Delete</button></td></tr>`}).join('')}</table></div></div>`;
+}
+
+function filterProductTable(){const q=(document.getElementById('pmSearch')?.value||'').toLowerCase().trim(),dep=document.getElementById('pmFilterDept')?.value||'',type=document.getElementById('pmFilterType')?.value||'';document.querySelectorAll('#pmTable tr[data-search]').forEach(r=>{const okQ=!q||r.dataset.search.includes(q),okD=!dep||r.dataset.dept===dep,okT=!type||r.dataset.type===type;r.style.display=okQ&&okD&&okT?'':'none'})}
+function pmOptions(list, selected){return list.map(x=>`<option value="${esc(x)}" ${String(x)===String(selected)?'selected':''}>${esc(x)}</option>`).join('')}
+function editProduct(pid){
+ let p=pid?d.products.find(x=>x.id===pid):{id:id('p'),name:'',sku:'',department:'Men',gender:'Men',ageGroup:'Adult',category:'Men',subcat:'T-Shirts',productType:'Clothing',price:0,salePrice:0,stock:0,brand:'',material:'',sizes:['S','M','L'],colors:['Black'],images:[],desc:'',visible:true,isNew:true,isBest:false,highlights:[],tags:[],variants:[]};
+ p={...p,department:p.department||p.gender||p.category||'Men',productType:p.productType||p.subcat||'Clothing',variants:Array.isArray(p.variants)?p.variants:[]};
+ const cats=(d.categories||[]).map(x=>x.name); const catList=[...new Set([...cats,'Kids','Men','Women','Unisex','Accessories'])];
+ const A='<div class="two"><div class="field"><label>';
+ let h='<h2>'+(pid?'Edit':'Add')+' Product</h2><div class="muted" style="margin-bottom:14px">One Product Manager for clothing, shoes, caps, bags, jewellery, watches and other products. Size and color fields are optional.</div><div class="form">';
+ h+=A+'Product Name</label><input id="pn" value="'+esc(p.name)+'"></div>'+A+'SKU</label><input id="ps" value="'+esc(p.sku)+'"></div></div>';
+ h+=A+'Department / Audience</label><select id="pdept">'+pmOptions(['Kids','Men','Women','Unisex','Accessories'],p.department)+'</select></div>'+A+'Age Group</label><select id="pageg">'+pmOptions(['Baby','Toddler','Kids','Teen','Adult','All Ages'],p.ageGroup||'Adult')+'</select></div></div>';
+ h+=A+'Main Category</label><select id="pc">'+pmOptions(catList,p.category)+'</select></div>'+A+'Product Type</label><select id="ptype">'+pmOptions(['Clothing','Shoes','Caps & Hats','Bags','Jewellery','Watches','Accessories','Sportswear','Beauty','Home & Lifestyle','Other'],p.productType)+'</select></div></div>';
+ h+=A+'Subcategory</label><input id="psc" value="'+esc(p.subcat)+'" placeholder="T-Shirts, Dresses, Sneakers, Rings, Watches..."></div>'+A+'Brand</label><input id="pbrand" value="'+esc(p.brand||'')+'"></div></div>';
+ h+=A+'Original / Regular Price</label><input id="pp" type="number" min="0" value="'+(p.price||0)+'" oninput="calcDiscountPreview()"></div>'+A+'Discount %</label><input id="pdisc" type="number" min="0" max="100" value="'+(p.discount||0)+'" oninput="calcSaleFromDiscount()"><div class="muted" id="discPreview" style="margin-top:5px"></div></div></div>';
+ h+=A+'Sale / Discounted Price</label><input id="psp" type="number" min="0" value="'+(p.salePrice||0)+'" oninput="calcDiscountFromSale()"></div>'+A+'Currency</label><select id="pcurrency">'+pmOptions(['LKR','USD','EUR','GBP'],p.currency||'LKR')+'</select></div></div>';
+ h+=A+'Total Stock</label><input id="pst" type="number" min="0" value="'+(p.stock||0)+'"></div>'+A+'Material / Specification</label><input id="pmat" value="'+esc(p.material||'')+'" placeholder="Cotton, Leather, Stainless Steel..."></div></div>';
+ h+=A+'Product Video URL — optional</label><input id="pvideo" value="'+esc(p.productVideo||'')+'" placeholder="https://example.com/product.mp4"></div>'+A+'Badge</label><select id="pbadge">'+pmOptions(['None','New Arrival','Hot Deal','Best Seller','Limited','Trending'],p.badge||'None')+'</select></div></div>';
+ h+='<div class="photo-manager"><div class="photo-manager-head"><div><b>Product Photos</b><div class="muted">Add as many photos as you need. The first photo is the main/cover photo.</div></div><div class="photo-upload"><input id="pfiles" type="file" accept="image/*" multiple onchange="addProductPhotos(event)"><label class="btn primary" for="pfiles">+ Upload Multiple Photos</label></div></div><div class="field"><label>Photo URLs — one URL per line</label><textarea id="pi" oninput="renderProductPhotoPreview()">'+esc((p.images||[]).join('\n'))+'</textarea><div class="muted">You can mix uploaded photos and image URLs. JPG, PNG, WEBP and other browser-supported image formats are accepted.</div></div><div id="photoPreview" class="photo-preview"></div></div>';
+ h+=A+'Sizes — optional</label><input id="psz" value="'+esc((p.sizes||[]).join(', '))+'" placeholder="S, M, L, XL or 38, 39, 40"></div>'+A+'Colors — optional</label><input id="pco" value="'+esc((p.colors||[]).join(', '))+'" placeholder="Black, White, Silver"></div></div>';
+ h+='<div class="two"><div class="field"><label>Product Badge</label><select id="pbadge">'+pmOptions(['None','New Arrival','Hot Deal','Best Seller','Limited','Trending'],p.badge||'None')+'</select></div><div class="field"><label>Barcode / Reference</label><input id="pbarcode" value="'+esc(p.barcode||'')+'" placeholder="Optional reference"></div></div>';
+ h+='<div class="card" style="margin:0;padding:14px;background:#fafafa"><h3 style="margin-top:0">Detailed Product Information</h3><div class="two"><div class="field"><label>Pattern / Design</label><input id="ppattern" value="'+esc(p.pattern||'')+'"></div><div class="field"><label>Fit / Shape</label><input id="pfit" value="'+esc(p.fit||'')+'"></div><div class="field"><label>Season / Collection</label><input id="pseason" value="'+esc(p.season||'')+'"></div><div class="field"><label>Occasion</label><input id="poccasion" value="'+esc(p.occasion||'')+'"></div><div class="field"><label>Care Instructions</label><input id="pcare" value="'+esc(p.care||'')+'"></div><div class="field"><label>Country of Origin</label><input id="porigin" value="'+esc(p.origin||'')+'"></div><div class="field"><label>Weight</label><input id="pweight" value="'+esc(p.weight||'')+'" placeholder="e.g. 250g"></div><div class="field"><label>Dimensions</label><input id="pdimensions" value="'+esc(p.dimensions||'')+'" placeholder="e.g. 30 x 20 x 10 cm"></div><div class="field"><label>Warranty</label><input id="pwarranty" value="'+esc(p.warranty||'')+'"></div><div class="field"><label>Water Resistance</label><input id="pwater" value="'+esc(p.waterResistance||'')+'"></div></div></div>';
+ h+='<div class="field"><label>Variant Stock & Pricing — optional JSON</label><textarea id="pvar">'+esc(JSON.stringify(p.variants||[],null,2))+'</textarea><div class="muted">Each variant can include color, size, stock, price and salePrice. Example: [{"color":"Black","size":"M","stock":10,"price":3500,"salePrice":2990}]</div></div>';
+ h+='<div class="field"><label>Tags — comma separated</label><input id="ptags" value="'+esc((p.tags||[]).join(', '))+'" placeholder="New, Trending, Gift, Premium"></div>';
+ h+='<div class="field"><label>Highlights — one per line</label><textarea id="phl">'+esc((p.highlights||[]).join('\n'))+'</textarea></div>';
+ h+='<div class="two"><div class="field"><label>Shipping Information</label><textarea id="pshipping" rows=3>'+esc(p.shippingInfo||'2-4 working days • Standard delivery available across Sri Lanka.')+'</textarea></div><div class="field"><label>Return / Exchange Policy</label><textarea id="preturn" rows=3>'+esc(p.returnPolicy||'7-day easy exchange on eligible items.')+'</textarea></div></div>';
+ h+='<div class="field"><label>Related Product IDs — comma separated (optional)</label><input id="prelated" value="'+esc((p.relatedProducts||[]).join(', '))+'" placeholder="1, 4, 7"></div>';
+ h+='<div class="field"><label>Description</label><textarea id="pd">'+esc(p.desc||p.description||'')+'</textarea></div>';
+ h+='<label class="switch"><input id="pv" type="checkbox" '+(p.visible!==false?'checked':'')+'> Visible on storefront</label><label class="switch"><input id="pnw" type="checkbox" '+(p.isNew?'checked':'')+'> New arrival</label><label class="switch"><input id="pbs" type="checkbox" '+(p.isBest?'checked':'')+'> Best seller</label>';
+ h+='<div><button class="btn" onclick="closeModal()">Cancel</button> <button class="btn primary" onclick="saveProduct(\''+p.id+'\')">Save Product</button></div></div>';
+ open(h);renderProductPhotoPreview();
+}
+
+function getProductPhotoList(){
+  return (document.getElementById('pi')?.value||'').split(/\n/).map(x=>x.trim()).filter(Boolean);
+}
+function setProductPhotoList(list){
+  const el=document.getElementById('pi'); if(!el)return;
+  el.value=list.filter(Boolean).join('\n');
+  renderProductPhotoPreview();
+}
+function renderProductPhotoPreview(){
+  const box=document.getElementById('photoPreview'); if(!box)return;
+  const imgs=getProductPhotoList();
+  if(!imgs.length){box.innerHTML='<div class="muted" style="grid-column:1/-1;padding:12px 0">No product photos added yet.</div>';return}
+  box.innerHTML=imgs.map((src,i)=>`<div class="photo-item"><span class="photo-index">${i+1}</span><button type="button" title="Remove" onclick="removeProductPhoto(${i})">×</button><img src="${esc(src)}" onerror="this.style.opacity='.25'" alt="Product photo ${i+1}"><small>${i===0?'Main photo':'Photo '+(i+1)}</small></div>`).join('');
+}
+function removeProductPhoto(index){
+  const imgs=getProductPhotoList(); imgs.splice(index,1); setProductPhotoList(imgs);
+}
+function addProductPhotos(ev){
+  const files=[...(ev.target.files||[])];
+  if(!files.length)return;
+  const current=getProductPhotoList();
+  const remaining=Math.max(0,30-current.length);
+  files.slice(0,remaining).forEach(file=>{
+    if(!file.type.startsWith('image/'))return;
+    const reader=new FileReader();
+    reader.onload=()=>{current.push(String(reader.result));setProductPhotoList(current)};
+    reader.readAsDataURL(file);
+  });
+  if(files.length>remaining) alert('Maximum 30 photos per product.');
+  ev.target.value='';
+}
+
+function calcDiscountFromSale(){const r=+document.getElementById('pp')?.value||0,s=+document.getElementById('psp')?.value||0;if(r>0&&s>=0){document.getElementById('pdisc').value=Math.max(0,Math.min(100,Math.round((1-s/r)*100)));}calcDiscountPreview()}
+function calcSaleFromDiscount(){const r=+document.getElementById('pp')?.value||0,d=+document.getElementById('pdisc')?.value||0;if(r>0){document.getElementById('psp').value=Math.max(0,Math.round(r*(1-d/100)));}calcDiscountPreview()}
+function calcDiscountPreview(){const r=+document.getElementById('pp')?.value||0,s=+document.getElementById('psp')?.value||0,d=+document.getElementById('pdisc')?.value||0;const e=document.getElementById('discPreview');if(e)e.textContent=r&&d?'Discounted price: Rs. '+Math.max(0,Math.round(r*(1-d/100))).toLocaleString():(r&&s?'Discount: '+Math.max(0,Math.round((1-s/r)*100))+'%':'');}
+function saveProduct(pid){
+  let variants=[]; try{variants=JSON.parse(document.getElementById('pvar').value||'[]');if(!Array.isArray(variants))throw 0}catch(e){alert('Variant Stock JSON is invalid. Use [] if you do not need variants.');return}
+  const name=pn.value.trim(); if(!name){alert('Product name is required');return}
+  const regular=+pp.value||0; const sale=+psp.value||0; const disc=Math.max(0,Math.min(100, +document.getElementById('pdisc').value||0));
+  const p={...(d.products.find(x=>x.id===pid)||{}),id:pid,name,sku:ps.value.trim(),department:pdept.value,gender:pdept.value,ageGroup:pageg.value,category:pc.value,productType:ptype.value,subcat:psc.value.trim(),brand:pbrand.value.trim(),price:regular,salePrice:sale||Math.max(0,Math.round(regular*(1-disc/100))),discount:sale&&regular?Math.max(0,Math.round((1-sale/regular)*100)):disc,currency:pcurrency.value,stock:+pst.value||0,material:pmat.value.trim(),pattern:ppattern.value.trim(),fit:pfit.value.trim(),season:pseason.value.trim(),occasion:poccasion.value.trim(),care:pcare.value.trim(),origin:porigin.value.trim(),weight:pweight.value.trim(),dimensions:pdimensions.value.trim(),warranty:pwarranty.value.trim(),waterResistance:pwater.value.trim(),images:pi.value.split('\n').map(x=>x.trim()).filter(Boolean),productVideo:(document.getElementById('pvideo')?.value||'').trim(),sizes:psz.value.split(',').map(x=>x.trim()).filter(Boolean),colors:pco.value.split(',').map(x=>x.trim()).filter(Boolean),variants,badge:(document.getElementById('pbadge')?.value||'None'),barcode:(document.getElementById('pbarcode')?.value||'').trim(),shippingInfo:(document.getElementById('pshipping')?.value||'').trim(),returnPolicy:(document.getElementById('preturn')?.value||'').trim(),relatedProducts:(document.getElementById('prelated')?.value||'').split(',').map(x=>x.trim()).filter(Boolean),variantStock:variants.reduce((a,v)=>{const k=[v.color||'',v.size||''].join('|');a[k]=Number(v.stock||0);return a},{}),tags:ptags.value.split(',').map(x=>x.trim()).filter(Boolean),highlights:phl.value.split('\n').map(x=>x.trim()).filter(Boolean),desc:pd.value,description:pd.value,visible:pv.checked,isNew:pnw.checked,isBest:pbs.checked};
+  const i=d.products.findIndex(x=>x.id===pid);if(i<0)d.products.push(p);else d.products[i]=p;save();closeModal();toast('Product saved');
+}
+function categories(){v('categories').innerHTML=`<div class="toolbar"><div><b>${d.categories.length} categories</b><div class="muted">Category name, image, text and category-specific filters are all editable here.</div></div><button class="btn primary" onclick="editCategory()">+ Add Category</button></div><div class="card">${d.categories.map(c=>`<div class="row"><div style="display:flex;gap:12px;align-items:center">${c.image?`<img src="${esc(c.image)}" style="width:58px;height:58px;object-fit:cover;border-radius:8px">`:''}<div><b>${esc(c.name)}</b><div class="muted">${esc(c.description||'')} · ${c.visible===false?'Hidden':'Visible'}</div><div class="muted">${esc(c.filterLabel||'Filter')} · ${(c.filterOptions||[]).length} options</div></div></div><div class="actions"><button class="btn" onclick="editCategory('${c.id}')">Edit</button><button class="btn" onclick="toggle('categories','${c.id}')">${c.visible===false?'Show':'Hide'}</button><button class="btn danger" onclick="del('categories','${c.id}')">Delete</button></div></div>`).join('')}</div>`}
+function editCategory(cid){let c=cid?d.categories.find(x=>x.id===cid):{id:id('c'),name:'',description:'',image:'',parent:'',visible:true,filterLabel:'',filterOptions:[]};open(`<h2>${cid?'Edit':'Add'} Category</h2><div class="form"><div class="field"><label>Name</label><input id="cn" value="${esc(c.name)}"></div><div class="field"><label>Description / Card Text</label><textarea id="cd">${esc(c.description)}</textarea></div><div class="field"><label>Category Image URL</label><input id="ci" value="${esc(c.image)}"></div><div class="field"><label>Parent category (optional)</label><input id="cp" value="${esc(c.parent)}"></div><div class="field"><label>Category Filter Label</label><input id="cfl" value="${esc(c.filterLabel||'')}" placeholder="e.g. Shoe Size"></div><div class="field"><label>Filter Options — one per line</label><textarea id="cfo" rows="7">${esc((c.filterOptions||[]).join('\n'))}</textarea><div class="muted">These options appear only when this category is selected in Shop.</div></div><label class="switch"><input id="cv" type="checkbox" ${c.visible!==false?'checked':''}> Visible</label><div><button class="btn" onclick="closeModal()">Cancel</button> <button class="btn primary" onclick="saveCategory('${c.id}')">Save</button></div></div>`)}
+function saveCategory(cid){
+  const i=d.categories.findIndex(x=>x.id===cid);
+  const old=i>=0?d.categories[i]:null;
+  const name=cn.value.trim();
+  if(!name){alert('Category name is required');return;}
+  const c={id:String(cid),name,description:cd.value.trim(),image:ci.value.trim(),parent:cp.value.trim(),visible:cv.checked,filterLabel:(document.getElementById('cfl')?.value||'').trim(),filterOptions:(document.getElementById('cfo')?.value||'').split('\n').map(x=>x.trim()).filter(Boolean),slug:name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')};
+  if(i<0)d.categories.push(c);else d.categories[i]=c;
+  if(old && old.name && old.name!==name){d.products.forEach(p=>{if(String(p.category||'').toLowerCase()===String(old.name).toLowerCase())p.category=name;});}
+  save();closeModal();
+}
+function menu(){
+  const items=d.menu||[];
+  function tree(parent=null,depth=0){return items.filter(x=>(x.parent||null)===parent).map(m=>`<div class="row" style="margin-left:${Math.min(depth,6)*22}px;border-left:${depth?'2px solid #e5e7eb':'0'} solid #e5e7eb;padding-left:${depth?12:0}px"><div><b>${esc(m.title||'Untitled')}</b><div class="muted">${esc(m.url||'#')} · ${m.visible===false?'Hidden':'Visible'} · Level ${depth+1}</div></div><div class="actions"><button class="btn" onclick="editMenu('${m.id}')">Edit</button><button class="btn" onclick="editMenu(null,'${m.id}')">+ Child</button><button class="btn" onclick="toggle('menu','${m.id}')">${m.visible===false?'Show':'Hide'}</button><button class="btn danger" onclick="del('menu','${m.id}')">Delete</button></div></div>`+tree(m.id,depth+1)).join('')}
+  v('menu').innerHTML=`<div class="toolbar"><div><b>${items.length} menu items</b><div class="muted">Unlimited nested levels: Kids → Boys → T-Shirts → Summer.</div></div><button class="btn primary" onclick="editMenu()">+ Add Main Menu</button></div><div class="card">${tree(null)||'<div class="muted">No menu items yet.</div>'}</div>`;
+}
+function editMenu(mid,parentOverride){
+  let m=mid?d.menu.find(x=>x.id===mid):{id:id('m'),title:'',url:'#shop',parent:parentOverride||null,visible:true};
+  const opts=[`<option value="">Top level</option>`].concat((d.menu||[]).filter(x=>x.id!==m.id).map(x=>`<option value="${esc(x.id)}" ${m.parent===x.id?'selected':''}>${esc(x.title||'Untitled')}</option>`)).join('');
+  open(`<h2>${mid?'Edit':'Add'} Menu Item</h2><div class="form"><div class="field"><label>Menu name</label><input id="mn" value="${esc(m.title)}"></div><div class="field"><label>URL / page</label><input id="mu" value="${esc(m.url)}"></div><div class="field"><label>Category link (optional)</label><select id="mcat"><option value="">No category link</option>${(d.categories||[]).map(c=>`<option value="${esc(c.name)}" ${String(m.category||'').toLowerCase()===String(c.name).toLowerCase()?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div><div class="field"><label>Parent menu</label><select id="mp">${opts}</select></div><label class="switch"><input id="mv" type="checkbox" ${m.visible!==false?'checked':''}> Visible</label><div><button class="btn" onclick="closeModal()">Cancel</button> <button class="btn primary" onclick="saveMenu('${m.id}')">Save Menu</button></div></div>`);
+}
+function saveMenu(mid){let parent=mp.value||null;if(parent===mid)parent=null;let m={id:mid,title:mn.value.trim()||'Untitled',url:mu.value.trim()||'#shop',category:(document.getElementById('mcat')?.value||''),parent,visible:mv.checked};let i=d.menu.findIndex(x=>x.id===mid);if(i<0)d.menu.push(m);else d.menu[i]=m;save();closeModal()}
+function hero(){let h=d.hero||{};h.button2Text=h.button2Text||'New Arrivals';h.button2Url=h.button2Url||'#shop';v('hero').innerHTML=`<div class="card form"><div style="font-size:13px;color:#64748b;margin-bottom:14px">Everything visible inside the full-screen video hero can be edited here. Use a direct public MP4/WebM/OGG video URL.</div><div class="field"><label>Hero Video URL</label><input id="heroVideoUrl" class="form-input" value="${esc(h.videoUrl||'')}" placeholder="https://example.com/banner.mp4"><div class="muted" style="margin-top:7px">Direct video file URL only (.mp4, .webm or .ogg).</div></div><div class="field"><label>Video Preview</label><div id="heroUrlPreview" style="height:220px;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;background:#f8fafc;display:flex;align-items:center;justify-content:center;color:#94a3b8">${h.videoUrl?`<video src="${esc(h.videoUrl)}" controls muted playsinline style="width:100%;height:100%;object-fit:cover"></video>`:'Paste a video URL to preview.'}</div></div><div class="field"><label>Eyebrow / Small Heading</label><input id="he" value="${esc(h.eyebrow||'')}" placeholder="New Season 2025"></div><div class="field"><label>Main Title</label><textarea id="ht" rows="2" placeholder="Dress Your Confidence">${esc(h.title||'')}</textarea><div class="muted">Use a line break if you want the title on two lines.</div></div><div class="field"><label>Subtitle / Description</label><textarea id="hs" rows="3" placeholder="Discover premium fashion...">${esc(h.subtitle||'')}</textarea></div><div class="two"><div class="field"><label>Primary Button Text</label><input id="hb" value="${esc(h.buttonText||'')}" placeholder="Shop Collection"></div><div class="field"><label>Primary Button URL</label><input id="hu" value="${esc(h.buttonUrl||'#shop')}" placeholder="#shop"></div></div><div class="two"><div class="field"><label>Secondary Button Text</label><input id="hb2" value="${esc(h.button2Text)}" placeholder="New Arrivals"></div><div class="field"><label>Secondary Button URL</label><input id="hu2" value="${esc(h.button2Url)}" placeholder="#shop"></div></div><label class="switch"><input id="hvis" type="checkbox" ${h.visible!==false?'checked':''}> Show hero</label><button class="btn primary" onclick="saveHero()">Save All Hero Settings</button></div>`;const u=document.getElementById('heroVideoUrl');if(u)u.addEventListener('input',()=>{const p=document.getElementById('heroUrlPreview');if(p)p.innerHTML=u.value.trim()?`<video src="${esc(u.value.trim())}" controls muted playsinline style="width:100%;height:100%;object-fit:cover"></video>`:'Paste a video URL to preview.'})}
+function saveHero(){const videoUrl=(document.getElementById('heroVideoUrl')?.value||'').trim();d.hero={...(d.hero||{}),mediaType:'video',videoUrl,images:Array.isArray(d.hero?.images)?d.hero.images:[],eyebrow:(document.getElementById('he')?.value||'').trim(),title:(document.getElementById('ht')?.value||'').trim(),subtitle:(document.getElementById('hs')?.value||'').trim(),buttonText:(document.getElementById('hb')?.value||'').trim(),buttonUrl:(document.getElementById('hu')?.value||'#shop').trim(),button2Text:(document.getElementById('hb2')?.value||'').trim(),button2Url:(document.getElementById('hu2')?.value||'#shop').trim(),visible:document.getElementById('hvis')?.checked!==false};save();}
+function editBanner(bid){let b=bid?d.banners.find(x=>x.id===bid):{id:id('b'),title:'',desktop:'',mobile:'',description:'',button:'Shop Now',url:'#shop',position:'mid',visible:true,order:(d.banners.length||0)+1};open(`<h2>${bid?'Edit':'Add'} Banner</h2><div class="form"><div class="field"><label>Title</label><input id="bn" value="${esc(b.title)}"></div><div class="field"><label>Desktop image URL</label><input id="bd" value="${esc(b.desktop)}"></div><div class="field"><label>Mobile image URL</label><input id="bm" value="${esc(b.mobile)}"></div><div class="field"><label>Image upload</label><input type="file" accept="image/*" onchange="readSingleImage(this,'bd')"></div><div class="field"><label>Description</label><input id="bdesc" value="${esc(b.description)}"></div><div class="two"><div class="field"><label>Button</label><input id="bb" value="${esc(b.button)}"></div><div class="field"><label>URL</label><input id="bu" value="${esc(b.url)}"></div></div><label class="switch"><input id="bvis" type="checkbox" ${b.visible!==false?'checked':''}> Visible</label><div><button class="btn" onclick="closeModal()">Cancel</button> <button class="btn primary" onclick="saveBanner('${b.id}')">Save Banner</button></div></div>`)}
+function saveBanner(bid){let old=d.banners.find(x=>x.id===bid);let b={id:bid,title:bn.value,desktop:bd.value,mobile:bm.value,description:bdesc.value,button:bb.value,url:bu.value,position:'mid',visible:bvis.checked,order:old?.order||d.banners.length+1};let i=d.banners.findIndex(x=>x.id===bid);if(i<0)d.banners.push(b);else d.banners[i]=b;d.banners=d.banners.sort((a,b)=>(a.order||0)-(b.order||0)).slice(0,3);save();closeModal()}
+function promise(){const p=d.promise||{visible:true,label:'Our Promise',title:'Why Shop With Us?',description:'',cards:[]};const cards=(p.cards||[]).slice(0,3);v('promise').innerHTML=`<div class="toolbar"><div><b>Our Promise / Why Shop With Us</b><div class="muted">Edit the section shown above the footer on the home page.</div></div><label class="switch"><input id="promiseVisible" type="checkbox" ${p.visible!==false?'checked':''}> Show Section</label></div><div class="card form"><div class="field"><label>Small Label</label><input id="prLabel" value="${esc(p.label||'')}" placeholder="Our Promise"></div><div class="field"><label>Main Heading</label><input id="prTitle" value="${esc(p.title||'')}" placeholder="Why Shop With Us?"></div><div class="field"><label>Description</label><textarea id="prDesc" rows="3" placeholder="Section description...">${esc(p.description||'')}</textarea></div>${cards.map((c,i)=>`<div class="card" style="margin:0 0 12px;background:#f8fafc"><div class="two"><div class="field"><label>Icon ${i+1}</label><input id="prIcon${i}" value="${esc(c.icon||'star')}" placeholder="zap, badge-check, heart"></div><div class="field"><label>Title</label><input id="prTitle${i}" value="${esc(c.title||'')}"></div></div><div class="field"><label>Description</label><textarea id="prText${i}" rows="3">${esc(c.text||'')}</textarea></div><label class="switch"><input id="prShow${i}" type="checkbox" ${c.visible!==false?'checked':''}> Show this item</label></div>`).join('')}<button class="btn primary" onclick="savePromise()">Save Our Promise</button></div>`}
+function savePromise(){const p=d.promise||{};p.visible=document.getElementById('promiseVisible')?.checked!==false;p.label=(document.getElementById('prLabel')?.value||'').trim();p.title=(document.getElementById('prTitle')?.value||'').trim();p.description=(document.getElementById('prDesc')?.value||'').trim();p.cards=(p.cards||[]).slice(0,3);for(let i=0;i<3;i++){const c=p.cards[i]||{id:'promise'+(i+1)};c.id=c.id||'promise'+(i+1);c.icon=(document.getElementById('prIcon'+i)?.value||'star').trim();c.title=(document.getElementById('prTitle'+i)?.value||'').trim();c.text=(document.getElementById('prText'+i)?.value||'').trim();c.visible=document.getElementById('prShow'+i)?.checked!==false;p.cards[i]=c}d.promise=p;save();toast('Our Promise saved')}
+function benefits(){const b=d.benefits||{visible:true,cards:[]};v('benefits').innerHTML=`<div class="toolbar"><div><b>Hero Benefits Bar</b><div class="muted">Edit the four service highlights shown directly below the video banner.</div></div><label class="switch"><input id="benefitsVisible" type="checkbox" ${b.visible!==false?'checked':''}> Show Benefits Bar</label></div><div class="card"><div class="muted" style="margin-bottom:14px">You can change the icon, title and description for each item. Keep them short for the best professional layout.</div>${(b.cards||[]).slice(0,4).map((c,i)=>`<div class="card" style="margin:0 0 12px;background:#f8fafc"><div class="two"><div class="field"><label>Icon ${i+1}</label><input id="bfIcon${i}" value="${esc(c.icon||'star')}" placeholder="truck, shield-check..."><div class="muted">Lucide icon name</div></div><div class="field"><label>Title</label><input id="bfTitle${i}" value="${esc(c.title||'')}"></div></div><div class="field"><label>Description</label><input id="bfText${i}" value="${esc(c.text||'')}"></div><label class="switch"><input id="bfShow${i}" type="checkbox" ${c.visible!==false?'checked':''}> Show this item</label></div>`).join('')}<button class="btn primary" onclick="saveBenefits()">Save Benefits Bar</button></div>`}
+function saveBenefits(){const b=d.benefits||{};b.visible=document.getElementById('benefitsVisible')?.checked!==false;b.cards=(b.cards||[]).slice(0,4);for(let i=0;i<4;i++){const c=b.cards[i]||{id:'benefit'+(i+1)};c.id=c.id||'benefit'+(i+1);c.icon=(document.getElementById('bfIcon'+i)?.value||'star').trim();c.title=(document.getElementById('bfTitle'+i)?.value||'').trim();c.text=(document.getElementById('bfText'+i)?.value||'').trim();c.visible=document.getElementById('bfShow'+i)?.checked!==false;b.cards[i]=c}d.benefits=b;save();try{localStorage.setItem(KEY,JSON.stringify(d));window.dispatchEvent(new StorageEvent('storage',{key:KEY}));}catch(e){}toast('Benefits Bar saved')}
+const THEMES={Midnight:['#111827','#f8fafc','#111827','#fff','#0f172a'],Blue:['#2563eb','#fff','#111827','#fff','#111827'],Emerald:['#047857','#ecfdf5','#064e3b','#fff','#064e3b'],Rose:['#be185d','#fff1f2','#500724','#fff','#500724'],Purple:['#7c3aed','#f5f3ff','#2e1065','#fff','#2e1065'],Teal:['#0f766e','#f0fdfa','#134e4a','#fff','#134e4a'],Orange:['#ea580c','#fff7ed','#431407','#fff','#431407'],Slate:['#475569','#f8fafc','#0f172a','#fff','#0f172a'],Cream:['#8b5e34','#fffaf0','#3d2b1f','#fff','#3d2b1f'],BlackGold:['#b08d57','#0b0b0b','#f5f5f5','#111','#050505'],Sky:['#0284c7','#f0f9ff','#082f49','#fff','#082f49'],Lavender:['#8b5cf6','#faf5ff','#3b0764','#fff','#3b0764']};
+function theme(){let t=d.theme;v('theme').innerHTML=`<div class="card"><h3>Presets</h3><div class="themegrid">${Object.entries(THEMES).map(([n,x])=>`<button class="theme" onclick="preset('${n}')"><div class="swatches"><i style="background:${x[0]}"></i><i style="background:${x[1]}"></i><i style="background:${x[3]}"></i><i style="background:${x[4]}"></i></div><b>${n}</b></button>`).join('')}</div></div><div class="card form"><h3>Custom colors</h3><div class="two"><div class="field"><label>Primary</label><input id="tp" type="color" value="${t.primary}"></div><div class="field"><label>Background</label><input id="tbg" type="color" value="${t.background}"></div><div class="field"><label>Text</label><input id="tt" type="color" value="${t.text}"></div><div class="field"><label>Header</label><input id="th" type="color" value="${t.header}"></div><div class="field"><label>Footer</label><input id="tf" type="color" value="${t.footer}"></div><div class="field"><label>Sale</label><input id="ts" type="color" value="${t.sale}"></div></div><button class="btn primary" onclick="saveTheme()">Save Theme</button></div>`}
+function preset(n){let x=THEMES[n];Object.assign(d.theme,{primary:x[0],background:x[1],text:x[2],header:x[3],footer:x[4],sale:'#dc2626',card:'#fff',muted:'#6b7280',badge:x[0]});save()}
+function saveTheme(){Object.assign(d.theme,{primary:tp.value,background:tbg.value,text:tt.value,header:th.value,footer:tf.value,sale:ts.value});save()}
+function branding(){let b=d.branding||{};v('branding').innerHTML=`<div class="card form"><h3>Store Identity</h3><div class="two"><div class="field"><label>Brand name</label><input id="brn" value="${esc(b.name)}"></div><div class="field"><label>Browser title</label><input id="brt" value="${esc(b.title)}"></div></div><div class="field"><label>Logo image URL</label><input id="brl" placeholder="https://..." value="${esc(b.logo||'')}" oninput="previewBrandImage('brl','brlogoPreview')"><div id="brlogoPreview" style="margin-top:10px"></div></div><div class="field"><label>Logo/Icon URL</label><input id="bri" placeholder="https://..." value="${esc(b.icon||'')}" oninput="previewBrandImage('bri','briconPreview')"><div id="briconPreview" style="margin-top:10px"></div></div><div class="field"><label>Favicon URL</label><input id="brfv" placeholder="https://..." value="${esc(b.favicon||'')}"><small class="muted">Use a direct image URL ending in .png, .jpg, .jpeg, .webp or .ico. Do not paste a webpage URL.</small></div><div class="field"><label>Footer text</label><textarea id="brf">${esc(b.footer)}</textarea></div><button class="btn primary" onclick="saveBranding()">Save Branding</button></div>`;setTimeout(()=>{previewBrandImage('brl','brlogoPreview');previewBrandImage('bri','briconPreview')},0)}
+function cleanImageUrl(x){x=String(x||'').trim();if(!x)return '';if(/^['"]/.test(x)&&/["']$/.test(x))x=x.slice(1,-1);return x}
+function previewBrandImage(inputId,previewId){const url=cleanImageUrl(document.getElementById(inputId)?.value);const box=document.getElementById(previewId);if(!box)return;if(!url){box.innerHTML='';return}box.innerHTML=`<div style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid #e5e7eb;border-radius:10px;background:#fff"><img src="${esc(url)}" style="width:72px;height:48px;object-fit:contain;border-radius:7px;background:#f3f4f6" onerror="this.style.display='none';this.nextElementSibling.textContent='Image URL could not be loaded'"><span class="muted">Preview</span></div>`}
+function saveBranding(){const name=(document.getElementById('brn')?.value||'').trim();const title=(document.getElementById('brt')?.value||'').trim();const logo=cleanImageUrl(document.getElementById('brl')?.value);const icon=cleanImageUrl(document.getElementById('bri')?.value);const favicon=cleanImageUrl(document.getElementById('brfv')?.value);const footer=(document.getElementById('brf')?.value||'').trim();d.branding={...(d.branding||{}),name,title,logo,icon,favicon,footer};save();toast('Branding saved — refresh the storefront to see the favicon/logo.')}
+function toggle(type,ident){let x=d[type].find(x=>x.id===ident);if(x){x.visible=x.visible===false;save()}}function del(type,ident){if(confirm('Delete this item?')){d[type]=d[type].filter(x=>x.id!==ident);save()}}
+function open(html){document.getElementById('modalbox').innerHTML=html;document.getElementById('modal').classList.add('open')}function closeModal(){document.getElementById('modal').classList.remove('open');document.getElementById('modalbox').innerHTML=''}
+
+function care(){v('care').innerHTML=`<div class="toolbar"><b>Customer Care links</b><button class="btn primary" onclick="editCare()">+ Add</button></div><div class="card">${(d.care.cards||[]).map(c=>`<div class="row"><div><b>${esc(c.title)}</b><div class="muted">${esc(c.text||'')} · ${esc(c.href||'')}</div></div><div class="actions"><button class="btn" onclick="editCare('${c.id}')">Edit</button><button class="btn" onclick="toggleCare('${c.id}')">${c.visible===false?'Show':'Hide'}</button><button class="btn danger" onclick="deleteCare('${c.id}')">Delete</button></div></div>`).join('')}</div><div class="card"><b>Email removal</b><p class="muted">The hard-coded Email Us card is hidden. Add a replacement only if you want one.</p></div>`}
+function editCare(cid){let c=cid?d.care.cards.find(x=>x.id===cid):{id:id('care'),title:'',text:'',value:'Open',href:'#',visible:true};open(`<h2>${cid?'Edit':'Add'} Customer Care Link</h2><div class="form"><div class="field"><label>Title</label><input id="ct" value="${esc(c.title)}"></div><div class="field"><label>Text</label><input id="cx" value="${esc(c.text)}"></div><div class="field"><label>Button</label><input id="cv" value="${esc(c.value||'Open')}"></div><div class="field"><label>URL</label><input id="ch" value="${esc(c.href||'#')}"></div><label class="switch"><input id="cshow" type="checkbox" ${c.visible!==false?'checked':''}> Show</label><button class="btn primary" onclick="saveCare('${c.id}')">Save</button></div>`)}
+function saveCare(cid){let c={id:cid,title:ct.value,text:cx.value,value:cv.value,href:ch.value,visible:cshow.checked};let i=d.care.cards.findIndex(x=>x.id===cid);if(i<0)d.care.cards.push(c);else d.care.cards[i]=c;save();closeModal()}
+function toggleCare(cid){let c=d.care.cards.find(x=>x.id===cid);if(c){c.visible=c.visible===false;save()}}
+function deleteCare(cid){d.care.cards=d.care.cards.filter(x=>x.id!==cid);save()}
+function footer(){
+ let f=d.footer||{}; if(!Array.isArray(f.sections))f.sections=[];
+ const sections=f.sections.map((sec,i)=>`<div class="card footer-section-card"><div class="toolbar"><div><b>Footer Column ${i+1}</b><div class="muted">Title and links shown in the storefront footer.</div></div><div class="actions"><button class="btn" onclick="footerSectionToggle(${i})">${sec.visible===false?'Show':'Hide'}</button><button class="btn danger" onclick="footerSectionDelete(${i})">Delete</button></div></div><div class="two"><div class="field"><label>Column title</label><input id="fs_title_${i}" value="${esc(sec.title||'')}"></div><div class="field"><label>Column ID</label><input id="fs_id_${i}" value="${esc(sec.id||'')}"></div></div><div>${(sec.links||[]).map((ln,j)=>`<div class="row footer-link-row"><div style="flex:1"><div class="two"><input id="fs_${i}_${j}_label" value="${esc(ln.label||'')}" placeholder="Link text"><input id="fs_${i}_${j}_url" value="${esc(ln.url||'')}" placeholder="#shop or https://..."></div></div><div class="actions"><button class="btn" onclick="footerLinkToggle(${i},${j})">${ln.visible===false?'Show':'Hide'}</button><button class="btn danger" onclick="footerLinkDelete(${i},${j})">Delete</button></div></div>`).join('')}</div><button class="btn" onclick="footerLinkAdd(${i})">+ Add Link</button></div>`).join('');
+ v('footer').innerHTML=`<div class="toolbar"><div><b>Professional Footer Manager</b><div class="muted">Edit every footer column, link text, link URL, visibility, payment method and footer text. Company/Customer Care page content is edited in Pages & Customer Care.</div></div><button class="btn primary" onclick="footerSectionAdd()">+ Add Footer Column</button></div><div class="card form"><label class="switch"><input id="fv" type="checkbox" ${f.visible!==false?'checked':''}> Show Footer</label><div class="field"><label>Footer description</label><textarea id="fd">${esc(f.description||d.branding?.footer||'')}</textarea></div><div class="two"><div class="field"><label>Copyright text</label><input id="fc" value="${esc(f.copyright||'© 2026 '+(d.branding?.name||'WOWSHOPPING.lk')+'. All rights reserved.')}"></div><div class="field"><label>Security text</label><input id="fsecure" value="${esc(f.secureText||'Secure Shopping')}"></div></div><div class="two"><div class="field"><label>Customer Care email</label><input id="femail" value="${esc(f.contact?.email||'')}" placeholder="support@example.com"></div><div class="field"><label>Customer Care phone</label><input id="fphone" value="${esc(f.contact?.phone||'')}" placeholder="+94 ..."></div></div><div class="field"><label>WhatsApp number / link</label><input id="fwa" value="${esc(f.contact?.whatsapp||'')}" placeholder="https://wa.me/..."></div></div>${sections}<div class="card form"><h3>Payment Methods</h3>${(f.payments||[]).map((p,i)=>`<div class="row"><b>${esc(p.name)}</b><div class="actions"><button class="btn" onclick="payToggle(${i})">${p.visible===false?'Show':'Hide'}</button><button class="btn danger" onclick="payDelete(${i})">Delete</button></div></div>`).join('')}<div class="two"><div class="field"><label>Add payment platform</label><input id="newpay" placeholder="VISA, COD, KOKO, etc."></div><button class="btn" onclick="payAdd()">Add Payment</button></div></div><div class="card"><h3>Social & Footer Links</h3><div class="muted">Use the Social & Footer section in the sidebar to edit social platforms and URLs.</div></div><button class="btn primary" onclick="saveFooter()">Save All Footer Changes</button>`
+}
+function footerSectionAdd(){d.footer.sections.push({id:'section'+Date.now(),title:'New Column',visible:true,links:[]});save()}
+function footerSectionToggle(i){d.footer.sections[i].visible=d.footer.sections[i].visible===false;save()}
+function footerSectionDelete(i){d.footer.sections.splice(i,1);save()}
+function footerLinkAdd(i){d.footer.sections[i].links.push({label:'New Link',url:'#',visible:true});save()}
+function footerLinkToggle(i,j){d.footer.sections[i].links[j].visible=d.footer.sections[i].links[j].visible===false;save()}
+function footerLinkDelete(i,j){d.footer.sections[i].links.splice(j,1);save()}
+function payAdd(){let n=newpay.value.trim();if(n){d.footer.payments.push({name:n,visible:true});save()}}
+function payToggle(i){d.footer.payments[i].visible=d.footer.payments[i].visible===false;save()}
+function payDelete(i){d.footer.payments.splice(i,1);save()}
+function saveFooter(){d.footer.visible=fv.checked;d.footer.description=fd.value;d.footer.copyright=fc.value;d.footer.secureText=fsecure.value;d.footer.contact={email:document.getElementById('femail')?.value.trim()||'',phone:document.getElementById('fphone')?.value.trim()||'',whatsapp:document.getElementById('fwa')?.value.trim()||''};d.footer.sections=d.footer.sections.map((sec,i)=>({...sec,title:document.getElementById('fs_title_'+i)?.value?.trim()||sec.title,id:document.getElementById('fs_id_'+i)?.value?.trim()||sec.id,links:(sec.links||[]).map((ln,j)=>({...ln,label:document.getElementById('fs_'+i+'_'+j+'_label')?.value?.trim()||ln.label,url:document.getElementById('fs_'+i+'_'+j+'_url')?.value?.trim()||ln.url}))}));save()}
+function shipping(){v('shipping').innerHTML=`<div class="card form"><div class="two"><div class="field"><label>Standard</label><input id="ss" type="number" value="${d.shipping?.standard||350}"></div><div class="field"><label>Express</label><input id="se" type="number" value="${d.shipping?.express||650}"></div></div><button class="btn primary" onclick="d.shipping={standard:+ss.value||0,express:+se.value||0};save()">Save Shipping</button></div>`}
+function settings(){v('settings').innerHTML=`<div class="card form"><h3>Store Controls</h3><div class="field"><label>Admin email</label><input id="ae" value="${esc(d.settings.adminEmail||'')}"></div><button class="btn primary" onclick="d.settings.adminEmail=ae.value;save()">Save Settings</button></div>`}
+
+boot();
+</script>
+<!-- WOWSHOPPING V9 ADMIN ENHANCEMENTS -->
+<style id="wow-admin-v9">
+.v9-admin-note{padding:12px 14px;border:1px solid #dbeafe;background:#eff6ff;color:#1e3a8a;border-radius:9px;font-size:12px;line-height:1.6;margin-bottom:14px}.v9-drag{cursor:grab}.v9-drag:active{cursor:grabbing}.v9-handle{font-size:18px;color:#94a3b8}.v9-social-card{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;border:1px solid #e5e7eb;border-radius:10px;padding:12px;margin-bottom:10px;background:#fff}.v9-social-icon{width:44px;height:44px;border-radius:10px;background:#111827;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900}.v9-page-editor{display:grid;gap:12px}.v9-page-editor .field textarea{min-height:180px}@media(max-width:800px){.v9-social-card{grid-template-columns:38px 1fr}.v9-social-card>.switch{grid-column:2}}
+.v9-managed-page-row textarea{min-height:180px;resize:vertical}.v9-managed-page-row{scroll-margin-top:20px}
+</style>
+<script>
+(function(){
+ const KEY='wow_admin_data_v4';
+ const esc9=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+ const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return{}}};
+ function ensure(){
+   if(!d.footer)d.footer={visible:true,description:'Premium online shopping experience.',copyright:'',secureText:'Secure Shopping',payments:[],sections:[],contact:{email:'',phone:'',whatsapp:''}};
+   if(!Array.isArray(d.footer.payments))d.footer.payments=[];
+   if(!d.footer.contact||typeof d.footer.contact!=='object')d.footer.contact={email:'',phone:'',whatsapp:''};
+   if(!Array.isArray(d.footer.sections))d.footer.sections=[];
+   if(!d.footer.sections.length)d.footer.sections=[
+     {id:'shopping',title:'Shopping',visible:true,links:[{label:'Men',url:'#shop',visible:true},{label:'Women',url:'#shop',visible:true},{label:'Kids',url:'#shop',visible:true},{label:'Accessories',url:'#shop',visible:true},{label:'New Arrivals',url:'#shop',visible:true},{label:'Sale',url:'#shop',visible:true}]},
+     {id:'customer-care',title:'Customer Care',visible:true,links:[{label:'Contact Us',url:'#contact',visible:true},{label:'Order Tracking',url:'#tracking',visible:true},{label:'FAQ',url:'#faq',visible:true},{label:'Exchange & Returns',url:'#exchange',visible:true},{label:'Delivery Information',url:'#delivery',visible:true}]},
+     {id:'company',title:'Company',visible:true,links:[{label:'About Us',url:'#about',visible:true},{label:'Privacy Policy',url:'#privacy',visible:true},{label:'Terms & Conditions',url:'#terms',visible:true},{label:'Shipping Policy',url:'#shipping',visible:true}]}
+   ];
+   d.footer.sections.forEach((sec,i)=>{sec.id=sec.id||('section'+i);sec.title=sec.title||'Links';if(!Array.isArray(sec.links))sec.links=[]});
+   if(!Array.isArray(d.socials))d.socials=[{id:'fb',name:'Facebook',icon:'facebook',url:'https://facebook.com',visible:true},{id:'ig',name:'Instagram',icon:'instagram',url:'https://instagram.com',visible:true},{id:'tt',name:'TikTok',icon:'tiktok',url:'https://tiktok.com',visible:true},{id:'wa',name:'WhatsApp',icon:'whatsapp',url:'https://wa.me/94112345678',visible:true},{id:'yt',name:'YouTube',icon:'youtube',url:'https://youtube.com',visible:true}];
+   if(!d.sitePages)d.sitePages={};
+   const pageDefaults={
+     about:{title:'About Us',body:'Tell your customers about your company.'},
+     privacy:{title:'Privacy Policy',body:'Add your privacy policy here.'},
+     terms:{title:'Terms & Conditions',body:'Add your terms and conditions here.'},
+     shipping:{title:'Shipping Policy',body:'Add your shipping policy here.'},
+     contact:{title:'Contact Us',body:'Add your contact information and support details here.'},
+     tracking:{title:'Order Tracking',body:'Add your order tracking instructions here.'},
+     faq:{title:'FAQ',body:'Add frequently asked questions and answers here.'},
+     exchange:{title:'Exchange & Returns',body:'Add your exchange and returns policy here.'},
+     delivery:{title:'Delivery Information',body:'Add delivery areas, timelines and charges here.'}
+   };
+   Object.entries(pageDefaults).forEach(([slug,pg])=>{if(!d.sitePages[slug])d.sitePages[slug]={...pg};});
+   const footerPageLinks={contact:'#contact',tracking:'#tracking',faq:'#faq',exchange:'#exchange',delivery:'#delivery',about:'#about',privacy:'#privacy',terms:'#terms',shipping:'#shipping'};
+   if(Array.isArray(d.footer?.sections)){
+     d.footer.sections.forEach(sec=>(sec.links||[]).forEach(ln=>{
+       const key=String(ln.label||'').toLowerCase().replace(/[^a-z]/g,'');
+       const map={contactus:'contact',ordertracking:'tracking',faq:'faq',exchangereturns:'exchange',exchangepolicy:'exchange',deliveryinformation:'delivery',deliveryinfo:'delivery',aboutus:'about',privacypolicy:'privacy',termsconditions:'terms',shippingpolicy:'shipping'};
+       if(map[key]) ln.url=footerPageLinks[map[key]];
+     }));
+   }
+   if(!d.care)d.care={cards:[],faq:[]};d.care.title=d.care.title||'Customer Care';d.care.intro=d.care.intro||'We are here to help with orders, delivery, exchanges and product questions.';d.care.faqTitle=d.care.faqTitle||'Frequently Asked Questions';
+   if(!Array.isArray(d.banners))d.banners=[];d.banners=d.banners.map((x,i)=>({...x,order:i+1,position:'carousel'}));
+ }
+ function write(){ensure();localStorage.setItem(KEY,JSON.stringify(d));render();window.dispatchEvent(new StorageEvent('storage',{key:KEY}));toast('Saved')}
+ window.v9AdminSave=write;
+ function addNav(){if(document.getElementById('v9-social-nav'))return;const nav=document.getElementById('nav');const b=document.createElement('button');b.id='v9-social-nav';b.textContent='Social & Footer';b.onclick=()=>v9Show('social');nav.appendChild(b);const p=document.createElement('button');p.id='v9-pages-nav';p.textContent='Pages & Customer Care';p.onclick=()=>v9Show('pages');nav.appendChild(p);const s=document.createElement('section');s.className='view';s.id='v-social';document.getElementById('views').appendChild(s);const ps=document.createElement('section');ps.className='view';ps.id='v-pages';document.getElementById('views').appendChild(ps)}
+ window.v9Show=function(section){current=section;document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));document.getElementById('v-'+section).classList.add('active');document.getElementById('title').textContent=section==='social'?'Social & Footer':'Pages & Customer Care';if(section==='social')renderSocial();else renderPages()};
+ function renderSocial(){ensure();const el=v('social');el.innerHTML=`<div class="card"><h3 style="margin-top:0">Footer & Social</h3><div class="v9-admin-note">Footer columns, links, payments and copyright are managed from Footer Manager. This area controls only social platforms.</div><div class="form"><label class="switch"><input id="v9fv" type="checkbox" ${d.footer.visible!==false?'checked':''}> Show Footer</label><div class="field"><label>Footer description</label><textarea id="v9fd">${esc9(d.footer.description||d.branding?.footer||'')}</textarea></div><div class="field"><label>Copyright</label><input id="v9fc" value="${esc9(d.footer.copyright||'© '+new Date().getFullYear()+' '+(d.branding?.name||'WOWSHOPPING.lk')+'. All rights reserved.')}"></div></div></div><div class="card"><div class="toolbar"><div><h3 style="margin:0">Follow Us</h3><div class="muted">Add links, change them anytime, or hide a platform without deleting it.</div></div><button class="btn primary" onclick="v9AddSocial()">+ Add Social</button></div>${d.socials.map((x,i)=>`<div class="v9-social-card"><div class="v9-social-icon">${esc9((x.name||'S').slice(0,1).toUpperCase())}</div><div class="form" style="gap:7px"><input id="v9sn${i}" value="${esc9(x.name)}" placeholder="Platform name"><input id="v9su${i}" value="${esc9(x.url)}" placeholder="https://..."><input id="v9si${i}" value="${esc9(x.icon||'link')}" placeholder="Lucide icon name"></div><label class="switch"><input id="v9sv${i}" type="checkbox" ${x.visible!==false?'checked':''}> Show</label></div>`).join('')}<button class="btn primary" onclick="v9SaveSocial()">Save Social Links</button></div>`}
+ window.v9SaveSocial=function(){ensure();d.footer.visible=document.getElementById('v9fv').checked;d.footer.description=document.getElementById('v9fd').value;d.footer.copyright=document.getElementById('v9fc').value;d.socials=d.socials.map((x,i)=>({...x,name:document.getElementById('v9sn'+i).value.trim(),url:document.getElementById('v9su'+i).value.trim(),icon:document.getElementById('v9si'+i).value.trim()||'link',visible:document.getElementById('v9sv'+i).checked}));write()};
+ window.v9AddSocial=function(){ensure();d.socials.push({id:id('social'),name:'New Platform',icon:'link',url:'https://',visible:true});write()};
+ function renderPages(){
+   ensure();
+   const c=d.care;
+   const pages=d.sitePages||{};
+   const pageRows=Object.entries(pages).map(([slug,p])=>`<div class="v9-managed-page-row" style="border-top:1px solid #eee;padding:18px 0">
+     <div class="two">
+       <div class="field"><label>Page key / slug</label><input id="v9ps_${esc9(slug)}" value="${esc9(slug)}"></div>
+       <div class="field"><label>Page title</label><input id="v9pt_${esc9(slug)}" value="${esc9(p.title)}"></div>
+     </div>
+     <div class="field"><label>Page content</label><textarea id="v9pb_${esc9(slug)}" rows="9">${esc9(p.body)}</textarea></div>
+     <div class="muted" style="margin-bottom:8px">Footer URL: #${esc9(slug)}</div>
+     <button class="btn danger" onclick="v9DeletePage('${esc9(slug)}')">Delete Page</button>
+   </div>`).join('');
+   el=v('pages');
+   el.innerHTML=`<div class="card">
+     <div class="toolbar"><div><h3 style="margin:0">Customer Care Page</h3><div class="muted">Edit the main customer-support content and FAQ heading.</div></div></div>
+     <div class="v9-page-editor">
+       <div class="field"><label>Page title</label><input id="v9ct" value="${esc9(c.title)}"></div>
+       <div class="field"><label>Intro text</label><textarea id="v9ci">${esc9(c.intro)}</textarea></div>
+       <div class="field"><label>FAQ heading</label><input id="v9cft" value="${esc9(c.faqTitle)}"></div>
+       <button class="btn primary" onclick="v9SaveCarePage()">Save Customer Care Page</button>
+     </div>
+   </div>
+   <div class="card">
+     <div class="toolbar">
+       <div><h3 style="margin:0">Footer Pages — Edit Everything</h3><div class="muted">Every Company and Customer Care footer page can be edited here. Changes appear on the storefront after saving.</div></div>
+       <div style="display:flex;gap:8px;flex-wrap:wrap">
+         <button class="btn" onclick="v9AddPage()">+ Add New Page</button>
+         <button class="btn primary" onclick="v9SavePages()">Save All Pages</button>
+       </div>
+     </div>
+     ${pageRows}
+     <div style="margin-top:14px;padding:12px 14px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;font-size:12px;color:#475569">
+       <b>Tip:</b> Footer links are connected to these page slugs. You can change the title and full text, or create additional pages and connect them from Footer Manager.
+     </div>
+   </div>`;
+ }
+ window.v9AddPage=function(){ensure();const slug='page-'+Date.now().toString().slice(-6);d.sitePages=d.sitePages||{};d.sitePages[slug]={title:'New Page',body:'Add your page content here.'};write()};
+ window.v9DeletePage=function(slug){ensure();if(!confirm('Delete this page?'))return;delete d.sitePages[slug];write()};
+ window.v9SaveCarePage=function(){ensure();d.care.title=document.getElementById('v9ct').value;d.care.intro=document.getElementById('v9ci').value;d.care.faqTitle=document.getElementById('v9cft').value;write()};
+ window.v9SavePages=function(){
+   ensure();
+   const next={}; const slugMap={};
+   Object.entries(d.sitePages||{}).forEach(([slug,p])=>{
+     const ns=(document.getElementById('v9ps_'+slug)?.value||slug).trim().toLowerCase().replace(/[^a-z0-9-_]+/g,'-').replace(/^-+|-+$/g,'')||slug;
+     slugMap[slug]=ns;
+     next[ns]={
+       title:document.getElementById('v9pt_'+slug)?.value?.trim()||p.title,
+       body:document.getElementById('v9pb_'+slug)?.value??p.body
+     };
+   });
+   d.sitePages=next;
+   (d.footer?.sections||[]).forEach(sec=>(sec.links||[]).forEach(ln=>{
+     const u=String(ln.url||'');
+     if(u.startsWith('#')){
+       const old=u.slice(1);
+       if(slugMap[old]) ln.url='#'+slugMap[old];
+     }
+   }));
+   write();
+   showToast?.('All pages saved','success');
+ };
+ // Unlimited carousel banners + drag reorder.
+ window.banners=function(){ensure();const bs=[...d.banners].sort((a,b)=>(a.order||0)-(b.order||0));v('banners').innerHTML=`<div class="toolbar"><div><b>Home Banner Carousel</b><div class="muted">Add as many banners as you want. All visible banners rotate inside one professional banner with Previous / Next controls.</div></div><button class="btn primary" onclick="editBanner()">+ Add Banner</button></div><div class="v9-admin-note">Tip: drag the cards to change the order. Use Hide when you want to keep a banner without showing it on the website.</div><div id="v9BannerAdminList">${bs.map((b,i)=>`<div class="card v9-drag" draggable="true" data-id="${esc9(b.id)}" style="margin-bottom:10px"><div class="row" style="padding:0;border:0"><div style="display:flex;align-items:center;gap:12px;min-width:0"><span class="v9-handle"></span>${b.desktop?`<img class="thumb" src="${esc9(b.desktop)}">`:''}<div><b>Banner ${i+1}: ${esc9(b.title||'Untitled')}</b><div class="muted">${b.visible===false?'Hidden':'Visible'} · ${esc9(b.category||'Featured')}</div></div></div><div class="actions"><button class="btn" onclick="editBanner('${esc9(b.id)}')">Edit</button><button class="btn" onclick="toggle('banners','${esc9(b.id)}')">${b.visible===false?'Show':'Hide'}</button><button class="btn danger" onclick="del('banners','${esc9(b.id)}')">Delete</button></div></div></div>`).join('')}</div>`;let drag=null;document.querySelectorAll('#v9BannerAdminList [draggable]').forEach(x=>{x.addEventListener('dragstart',()=>drag=x);x.addEventListener('dragover',e=>e.preventDefault());x.addEventListener('drop',e=>{e.preventDefault();if(!drag||drag===x)return;const arr=[...document.querySelectorAll('#v9BannerAdminList [data-id]')].map(z=>z.dataset.id);const from=arr.indexOf(drag.dataset.id),to=arr.indexOf(x.dataset.id);if(from<0||to<0)return;const idv=arr.splice(from,1)[0];arr.splice(to,0,idv);d.banners.forEach(b=>b.order=arr.indexOf(b.id)+1);write()})})}
+ // Better banner editor with mobile image and direct upload support.
+ window.editBanner=function(bid){ensure();let b=bid?d.banners.find(x=>x.id===bid):{id:id('b'),title:'',desktop:'',mobile:'',description:'',button:'Shop Now',url:'#shop',category:'Featured',position:'carousel',visible:true,order:d.banners.length+1};open(`<h2>${bid?'Edit':'Add'} Banner</h2><div class="form"><div class="two"><div class="field"><label>Title</label><input id="bn" value="${esc9(b.title)}"></div><div class="field"><label>Category / Label</label><input id="bcat" value="${esc9(b.category||'Featured')}"></div></div><div class="field"><label>Desktop image URL</label><input id="bd" value="${esc9(b.desktop)}"></div><div class="field"><label>Mobile image URL (optional)</label><input id="bm" value="${esc9(b.mobile)}"></div><div class="field"><label>Upload desktop image</label><input type="file" accept="image/*" onchange="readSingleImage(this,'bd')"></div><div class="field"><label>Description</label><input id="bdesc" value="${esc9(b.description)}"></div><div class="two"><div class="field"><label>Button text</label><input id="bb" value="${esc9(b.button)}"></div><div class="field"><label>Button URL</label><input id="bu" value="${esc9(b.url)}"></div></div><label class="switch"><input id="bvis" type="checkbox" ${b.visible!==false?'checked':''}> Visible in carousel</label><div><button class="btn" onclick="closeModal()">Cancel</button> <button class="btn primary" onclick="v9SaveBanner('${esc9(b.id)}')">Save Banner</button></div></div>`)};
+ window.v9SaveBanner=function(bid){ensure();let old=d.banners.find(x=>x.id===bid);let b={id:bid,title:document.getElementById('bn').value,category:document.getElementById('bcat').value,desktop:document.getElementById('bd').value,mobile:document.getElementById('bm').value,description:document.getElementById('bdesc').value,button:document.getElementById('bb').value,url:document.getElementById('bu').value,position:'carousel',visible:document.getElementById('bvis').checked,order:old?.order||d.banners.length+1};let i=d.banners.findIndex(x=>x.id===bid);if(i<0)d.banners.push(b);else d.banners[i]=b;d.banners.forEach((x,i)=>x.order=i+1);write();closeModal()};
+ const baseRender=window.render;window.render=function(){if(current==='social'){renderSocial();return}if(current==='pages'){renderPages();return}return baseRender()};
+ const baseBoot=window.boot;window.addEventListener('load',()=>setTimeout(()=>{ensure();addNav();show(current||'dashboard');},50));
+ // Make old banner label accurate.
+ window.addEventListener('load',()=>setTimeout(()=>{const btn=document.querySelector('#nav button[data-s="banners"]');if(btn)btn.textContent='Banner Carousel';},80));
+})();
+</script>
+</body></html>
