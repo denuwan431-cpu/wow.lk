@@ -4062,18 +4062,28 @@ window.addEventListener('wow:benefits-updated',()=>applyBenefitsToSite());
 const K='wow_admin_data_v4';
 function R(){try{return JSON.parse(localStorage.getItem(K)||'{}')}catch(e){return{}}}
 let wowRemoteStorefrontLoaded=false;
+let wowRemoteStorefrontUnsubscribe=null;
+function applyRemoteStorefront(remote){
+  if(!remote || typeof remote!=='object') return false;
+  localStorage.setItem(K,JSON.stringify(remote));
+  wowRemoteStorefrontLoaded=true;
+  patch();
+  if(typeof window.renderEnhancedBanners==='function') window.renderEnhancedBanners();
+  return true;
+}
 async function loadRemoteStorefrontData(){
   try{
     if(!firebaseDb) return false;
-    const snap=await firebaseDb.collection('siteConfig').doc('storefront').get();
-    if(!snap.exists) return false;
-    const remote=snap.data()?.data;
-    if(!remote || typeof remote!=='object') return false;
-    localStorage.setItem(K,JSON.stringify(remote));
-    wowRemoteStorefrontLoaded=true;
-    patch();
-    if(typeof window.renderEnhancedBanners==='function') window.renderEnhancedBanners();
-    return true;
+    if(wowRemoteStorefrontUnsubscribe) return true;
+    const ref=firebaseDb.collection('siteConfig').doc('storefront');
+    wowRemoteStorefrontUnsubscribe=ref.onSnapshot(snap=>{
+      if(!snap.exists) return;
+      try{ applyRemoteStorefront(snap.data()?.data); }
+      catch(e){ console.warn('WOWSHOPPING storefront snapshot:',e); }
+    },err=>console.warn('WOWSHOPPING storefront listener:',err));
+    const snap=await ref.get();
+    if(snap.exists) return applyRemoteStorefront(snap.data()?.data);
+    return false;
   }catch(e){console.warn('WOWSHOPPING storefront sync:',e);return false}
 }
 function E(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
