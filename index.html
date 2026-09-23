@@ -1068,7 +1068,6 @@ body.wow-ready #site-header{opacity:1}
           <div style="border-top:1px solid #f0f0f0;padding-top:12px;">
             <div class="admin-nav-item" style="color:#374151;" onclick="showAccTab('overview')"><i data-lucide="layout-dashboard" style="width:16px;height:16px;"></i> Overview</div>
             <div class="admin-nav-item" style="color:#374151;" onclick="showAccTab('orders')"><i data-lucide="package" style="width:16px;height:16px;"></i> My Orders</div>
-            <div class="admin-nav-item" style="color:#374151;" onclick="showAccTab('addresses')"><i data-lucide="map-pin" style="width:16px;height:16px;"></i> Addresses</div>
             <div class="admin-nav-item" style="color:#374151;" onclick="showAccTab('wishlist')"><i data-lucide="heart" style="width:16px;height:16px;"></i> Wishlist</div>
             <div class="admin-nav-item" style="color:#374151;" onclick="showAccTab('profile')"><i data-lucide="settings" style="width:16px;height:16px;"></i> Profile</div>
             <div class="admin-nav-item" style="color:#ef4444;margin-top:8px;" onclick="logout()"><i data-lucide="log-out" style="width:16px;height:16px;"></i> Sign Out</div>
@@ -2706,7 +2705,7 @@ function renderAccount() {
   if (!status.complete) {
     // Guide new Google/phone customers directly to the first missing section.
     if (!currentUser.name || currentUser.name.length < 2 || !currentUser.phoneVerified) showAccTab('profile');
-    else showAccTab('addresses');
+    else showAccTab('profile');
   } else {
     showAccTab('overview');
   }
@@ -2725,13 +2724,13 @@ function showAccTab(tab) {
             <div style="flex:1"><div style="font-weight:800;color:#92400e;margin-bottom:5px">Complete your account before shopping</div>
             <div style="font-size:13px;color:#78350f;line-height:1.6">Please add and verify your mobile number and complete your delivery address. You can place an order only after all required details are saved.</div>
             <div style="font-size:12px;color:#92400e;margin-top:7px"><b>Missing:</b> ${esc(getAccountCompletion().missing.join(', '))}</div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn btn-dark btn-sm" onclick="showAccTab('${(!currentUser.phoneVerified || !currentUser.name) ? 'profile' : 'addresses'}')">Complete Details</button></div></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn btn-dark btn-sm" onclick="showAccTab('profile')">Complete Details</button></div></div>
           </div>
         </div>` : ''}
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;">
           <div class="stat-card" style="text-align:center;"><div style="font-size:28px;font-weight:800;color:#2563eb;">${ORDERS_DEMO.length}</div><div style="font-size:13px;color:#6b7280;">Total Orders</div></div>
           <div class="stat-card" style="text-align:center;"><div style="font-size:28px;font-weight:800;color:#10b981;">${wishlist.length}</div><div style="font-size:13px;color:#6b7280;">Wishlist Items</div></div>
-          <div class="stat-card" style="text-align:center;"><div style="font-size:28px;font-weight:800;color:#f59e0b;">${getAccountCompletion().complete ? 1 : 0}</div><div style="font-size:13px;color:#6b7280;">Saved Addresses</div></div>
+          <div class="stat-card" style="text-align:center;"><div style="font-size:28px;font-weight:800;color:#f59e0b;">${getAccountCompletion().complete ? 1 : 0}</div><div style="font-size:13px;color:#6b7280;">Delivery Address</div></div>
         </div>
         <div class="admin-card">
           <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">Recent Orders</h3>
@@ -2792,7 +2791,6 @@ function showAccTab(tab) {
           <div class="wow-form-title"><span class="wow-form-icon" style="background:#fff7ed;color:#ea580c;"><i data-lucide="map-pin" style="width:18px;height:18px;"></i></span><span>Delivery address</span></div>
           <div class="wow-field-grid">
             <div class="wow-field wow-field-full"><label>Address Line 1 <span class="wow-required">*</span></label><input class="form-input" id="cpAddress" value="${esc(currentUser.address||'')}" placeholder="House / No, Street" autocomplete="street-address"></div>
-            <div class="wow-field wow-field-full"><label>Address Line 2 <span style="font-weight:500;color:#94a3b8;">(Optional)</span></label><input class="form-input" id="cpAddress2" value="${esc(currentUser.addressLine2||'')}" placeholder="Apartment, floor, landmark"></div>
             <div class="wow-field"><label>City <span class="wow-required">*</span></label><input class="form-input" id="cpCity" value="${esc(currentUser.city||'')}" placeholder="Your city" autocomplete="address-level2"></div>
             <div class="wow-field"><label>District <span class="wow-required">*</span></label><input class="form-input" id="cpDistrict" value="${esc(currentUser.district||'')}" placeholder="Your district"></div>
             <div class="wow-field"><label>Province <span class="wow-required">*</span></label><input class="form-input" id="cpProvince" value="${esc(currentUser.province||'')}" placeholder="Your province"></div>
@@ -2807,26 +2805,6 @@ function showAccTab(tab) {
       </div>`;
     lucide.createIcons();
     if(!currentUser.phoneVerified) setTimeout(()=>setupLinkRecaptcha().catch(()=>{}),100);
-  } else if (tab === 'addresses') {
-    container.innerHTML = `
-      <div>
-        <h2 style="font-size:20px;font-weight:800;margin-bottom:20px;">Delivery Address</h2>
-        <div class="admin-card">
-          <div style="display:grid;gap:14px;max-width:680px">
-            <div><label class="form-label">Full Name</label><input class="form-input" id="aName" value="${esc(currentUser.name||'')}"/></div>
-            <div><label class="form-label">Address Line 1</label><input class="form-input" id="aAddress" value="${esc(currentUser.address||'')}" placeholder="House / No, Street"/></div>
-            <div><label class="form-label">Address Line 2</label><input class="form-input" id="aAddress2" value="${esc(currentUser.addressLine2||'')}" placeholder="Apartment, floor, landmark (optional)"/></div>
-            <div class="wow-profile-grid">
-              <div><label class="form-label">City</label><input class="form-input" id="aCity" value="${esc(currentUser.city||'')}"/></div>
-              <div><label class="form-label">District</label><input class="form-input" id="aDistrict" value="${esc(currentUser.district||'')}"/></div>
-              <div><label class="form-label">Province</label><input class="form-input" id="aProvince" value="${esc(currentUser.province||'')}"/></div>
-              <div><label class="form-label">Postal Code</label><input class="form-input" id="aPostal" value="${esc(currentUser.postalCode||'')}" inputmode="numeric"/></div>
-            </div>
-            <button class="btn btn-dark" style="width:fit-content" onclick="saveAddress()">Save Address</button>
-          </div>
-        </div>
-      </div>`;
-    lucide.createIcons();
   } else if (tab === 'wishlist') {
     container.innerHTML = `<div><h2 style="font-size:20px;font-weight:800;margin-bottom:20px;">My Wishlist</h2><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;" id="accWishGrid"></div></div>`;
     const grid = document.getElementById('accWishGrid');
@@ -2862,7 +2840,6 @@ async function saveAddress(){
   const data={
     name,
     address:(document.getElementById('aAddress')?.value||'').trim(),
-    addressLine2:(document.getElementById('aAddress2')?.value||'').trim(),
     city:(document.getElementById('aCity')?.value||'').trim(),
     district:(document.getElementById('aDistrict')?.value||'').trim(),
     province:(document.getElementById('aProvince')?.value||'').trim(),
@@ -2892,7 +2869,6 @@ async function saveCompleteAccount() {
   const data={
     name:(document.getElementById('cpName')?.value||'').trim(),
     address:(document.getElementById('cpAddress')?.value||'').trim(),
-    addressLine2:(document.getElementById('cpAddress2')?.value||'').trim(),
     city:(document.getElementById('cpCity')?.value||'').trim(),
     district:(document.getElementById('cpDistrict')?.value||'').trim(),
     province:(document.getElementById('cpProvince')?.value||'').trim(),
