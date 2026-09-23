@@ -586,6 +586,29 @@ body.wow-ready #site-header{opacity:1}
   .wow-unverified{font-size:11px;color:#b45309;margin-top:6px;font-weight:700}
   .wow-online-dot{width:9px;height:9px;border-radius:50%;background:#22c55e;display:inline-block;box-shadow:0 0 0 3px #dcfce7}
   @media(max-width:700px){.wow-profile-grid{grid-template-columns:1fr}.wow-verify-row{flex-direction:column;align-items:stretch}}
+  /* Premium account profile */
+  .wow-account-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:22px}
+  .wow-complete-card{background:linear-gradient(135deg,#111827,#1f2937);color:#fff;border-radius:18px;padding:20px 22px;box-shadow:0 12px 30px rgba(17,24,39,.12);margin-bottom:18px}
+  .wow-progress{height:7px;background:rgba(255,255,255,.16);border-radius:99px;overflow:hidden;margin-top:13px}
+  .wow-progress>span{display:block;height:100%;background:#60a5fa;border-radius:99px;transition:width .3s ease}
+  .wow-form-card{background:#fff;border:1px solid #e8edf3;border-radius:18px;padding:22px;box-shadow:0 8px 24px rgba(15,23,42,.045);margin-bottom:16px}
+  .wow-form-title{display:flex;align-items:center;gap:11px;font-size:15px;font-weight:800;margin-bottom:17px;color:#111827}
+  .wow-form-icon{width:36px;height:36px;border-radius:10px;background:#eff6ff;color:#2563eb;display:flex;align-items:center;justify-content:center;flex:none}
+  .wow-required{color:#ef4444;font-size:11px;margin-left:3px}
+  .wow-field{display:grid;gap:6px}
+  .wow-field label{font-size:12px;font-weight:700;color:#475569}
+  .wow-field .form-input{width:100%}
+  .wow-field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+  .wow-field-full{grid-column:1/-1}
+  .wow-locked{background:#f8fafc!important;color:#64748b!important;cursor:not-allowed}
+  .wow-savebar{display:flex;align-items:center;justify-content:space-between;gap:15px;padding-top:5px}
+  .wow-save-note{font-size:12px;color:#64748b;line-height:1.5}
+  .wow-status-pill{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:5px 10px;font-size:11px;font-weight:800}
+  .wow-status-ok{background:#ecfdf5;color:#047857}
+  .wow-status-warn{background:#fff7ed;color:#c2410c}
+  .wow-section-divider{border:0;border-top:1px solid #eef2f7;margin:20px 0}
+  @media(max-width:700px){.wow-field-grid{grid-template-columns:1fr}.wow-field-full{grid-column:auto}.wow-account-head{flex-direction:column}.wow-savebar{align-items:stretch;flex-direction:column}.wow-savebar .btn{width:100%;justify-content:center}}
+
   .wow-auth-primary{height:50px!important;border-radius:11px!important;background:#111827!important;box-shadow:0 10px 22px rgba(15,23,42,.13);font-weight:800!important;}
   .wow-auth-primary:hover{background:#1f2937!important;transform:translateY(-1px);}
   .wow-auth-google{height:50px!important;border-radius:11px!important;background:#fff!important;border:1px solid #dbe2ea!important;color:#111827!important;font-weight:750!important;}
@@ -2725,23 +2748,61 @@ function showAccTab(tab) {
         </div>
       </div>`;
   } else if (tab === 'profile') {
+    const completion = getAccountCompletion();
+    const done = 7 - completion.missing.length;
+    const pct = Math.round((done / 7) * 100);
     container.innerHTML = `
       <div>
-        <h2 style="font-size:20px;font-weight:800;margin-bottom:20px;">Profile & Security</h2>
-        <div class="wow-profile-grid">
-          <div class="wow-profile-card">
-            <h3 style="font-size:15px;font-weight:800;margin:0 0 14px">Personal details</h3>
-            <div style="display:grid;gap:14px">
-              <div><label class="form-label">Full Name</label><input class="form-input" value="${esc(currentUser.name||'')}" id="pName" maxlength="80"/></div>
-              <div><label class="form-label">Email Address</label><input class="form-input" type="email" value="${esc(currentUser.email||'')}" id="pEmail" readonly ${currentUser.email?'':'placeholder="No email linked"'}/></div>
-              <div><label class="form-label">Login method</label><input class="form-input" value="${esc((currentUser.loginProvider||'customer').toUpperCase())}" readonly/></div>
-              <button class="btn btn-dark btn-sm" style="width:fit-content" onclick="saveProfile()">Save Changes</button>
-            </div>
+        <div class="wow-account-head">
+          <div><h2 style="font-size:24px;font-weight:850;margin-bottom:5px;letter-spacing:-.3px;">My Account</h2><p style="font-size:13px;color:#64748b;">Keep your details complete so checkout and delivery work smoothly.</p></div>
+          <span class="wow-status-pill ${completion.complete?'wow-status-ok':'wow-status-warn'}">${completion.complete?'✓ Account complete':'! Details required'}</span>
+        </div>
+
+        <div class="wow-complete-card">
+          <div style="display:flex;justify-content:space-between;gap:15px;align-items:flex-end;">
+            <div><div style="font-size:12px;opacity:.72;text-transform:uppercase;letter-spacing:.08em;font-weight:800;">Profile completion</div><div style="font-size:22px;font-weight:850;margin-top:2px;">${pct}% complete</div></div>
+            <div style="font-size:12px;opacity:.78;">${completion.complete?'Ready for checkout':'Please complete the highlighted details'}</div>
           </div>
-          <div class="wow-profile-card">
-            <h3 style="font-size:15px;font-weight:800;margin:0 0 14px">Mobile verification <span style="color:#dc2626;font-size:11px">Required to purchase</span></h3>
-            ${currentUser.phoneVerified?`<div class="wow-verified">✓ Verified phone: ${esc(currentUser.phone)}</div><p style="font-size:12px;color:#64748b;line-height:1.6">This phone is linked to your Firebase account. You do not need to verify this same number again while it remains linked.</p>`:`<div class="wow-unverified">Phone number not linked</div><p style="font-size:12px;color:#64748b;line-height:1.6">Add your Sri Lankan mobile number and verify it with a real SMS OTP.</p><div id="phone-link-recaptcha" class="wow-auth-recaptcha"></div><div id="phoneLinkBox"><div class="wow-verify-row"><input class="form-input" id="linkPhone" type="tel" inputmode="tel" placeholder="077 123 4567"><button class="btn btn-dark" onclick="startPhoneLink()">Send OTP</button></div></div>`}
+          <div class="wow-progress"><span style="width:${pct}%"></span></div>
+          ${completion.missing.length?`<div style="font-size:11px;opacity:.76;margin-top:10px;">Missing: ${esc(completion.missing.join(' • '))}</div>`:''}
+        </div>
+
+        <div class="wow-form-card">
+          <div class="wow-form-title"><span class="wow-form-icon"><i data-lucide="user-round" style="width:18px;height:18px;"></i></span><span>Personal information</span></div>
+          <div class="wow-field-grid">
+            <div class="wow-field wow-field-full"><label>Full Name <span class="wow-required">*</span></label><input class="form-input" id="cpName" value="${esc(currentUser.name||'')}" maxlength="80" placeholder="Enter your full name" autocomplete="name"></div>
+            <div class="wow-field"><label>Email Address</label><input class="form-input wow-locked" type="email" value="${esc(currentUser.email||'')}" readonly placeholder="No email linked"></div>
+            <div class="wow-field"><label>Login Method</label><input class="form-input wow-locked" value="${esc((currentUser.loginProvider||'customer').toUpperCase())}" readonly></div>
           </div>
+        </div>
+
+        <div class="wow-form-card">
+          <div class="wow-form-title"><span class="wow-form-icon" style="background:#ecfdf5;color:#059669;"><i data-lucide="smartphone" style="width:18px;height:18px;"></i></span><span>Mobile verification <span class="wow-required">*</span></span></div>
+          ${currentUser.phoneVerified ? `
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;"><div><div style="font-size:13px;font-weight:800;color:#047857;">✓ Mobile number verified</div><div style="font-size:12px;color:#64748b;margin-top:3px;">${esc(currentUser.phone||'')}</div></div><span class="wow-status-pill wow-status-ok">Verified</span></div>
+          ` : `
+            <div class="wow-status-pill wow-status-warn" style="margin-bottom:10px;">Mobile verification required for checkout</div>
+            <p style="font-size:12px;color:#64748b;line-height:1.6;margin-bottom:12px;">Add your Sri Lankan mobile number and verify it with SMS OTP. Your number is securely linked to this account.</p>
+            <div id="phone-link-recaptcha" class="wow-auth-recaptcha"></div>
+            <div id="phoneLinkBox"><div class="wow-verify-row"><input class="form-input" id="linkPhone" type="tel" inputmode="tel" placeholder="077 123 4567" autocomplete="tel"><button class="btn btn-dark" onclick="startPhoneLink()">Send OTP</button></div></div>
+          `}
+        </div>
+
+        <div class="wow-form-card">
+          <div class="wow-form-title"><span class="wow-form-icon" style="background:#fff7ed;color:#ea580c;"><i data-lucide="map-pin" style="width:18px;height:18px;"></i></span><span>Delivery address</span></div>
+          <div class="wow-field-grid">
+            <div class="wow-field wow-field-full"><label>Address Line 1 <span class="wow-required">*</span></label><input class="form-input" id="cpAddress" value="${esc(currentUser.address||'')}" placeholder="House / No, Street" autocomplete="street-address"></div>
+            <div class="wow-field wow-field-full"><label>Address Line 2 <span style="font-weight:500;color:#94a3b8;">(Optional)</span></label><input class="form-input" id="cpAddress2" value="${esc(currentUser.addressLine2||'')}" placeholder="Apartment, floor, landmark"></div>
+            <div class="wow-field"><label>City <span class="wow-required">*</span></label><input class="form-input" id="cpCity" value="${esc(currentUser.city||'')}" placeholder="Your city" autocomplete="address-level2"></div>
+            <div class="wow-field"><label>District <span class="wow-required">*</span></label><input class="form-input" id="cpDistrict" value="${esc(currentUser.district||'')}" placeholder="Your district"></div>
+            <div class="wow-field"><label>Province <span class="wow-required">*</span></label><input class="form-input" id="cpProvince" value="${esc(currentUser.province||'')}" placeholder="Your province"></div>
+            <div class="wow-field"><label>Postal Code <span class="wow-required">*</span></label><input class="form-input" id="cpPostal" value="${esc(currentUser.postalCode||'')}" inputmode="numeric" maxlength="10" placeholder="e.g. 11500" autocomplete="postal-code"></div>
+          </div>
+        </div>
+
+        <div class="wow-savebar">
+          <div class="wow-save-note"><strong style="color:#334155;">Required fields are marked *</strong><br>Your information is used for account and delivery purposes.</div>
+          <button class="btn btn-dark" onclick="saveCompleteAccount()"><i data-lucide="save" style="width:16px;height:16px;"></i> Save Account Details</button>
         </div>
       </div>`;
     lucide.createIcons();
@@ -2826,6 +2887,45 @@ async function saveAddress(){
     if(getAccountCompletion().complete) showAccTab('overview');
   }catch(e){console.error(e);showToast('Could not save address.','error')}
 }
+async function saveCompleteAccount() {
+  if(!firebaseAuth?.currentUser || !firebaseDb){showToast('Please sign in again.','error');return;}
+  const data={
+    name:(document.getElementById('cpName')?.value||'').trim(),
+    address:(document.getElementById('cpAddress')?.value||'').trim(),
+    addressLine2:(document.getElementById('cpAddress2')?.value||'').trim(),
+    city:(document.getElementById('cpCity')?.value||'').trim(),
+    district:(document.getElementById('cpDistrict')?.value||'').trim(),
+    province:(document.getElementById('cpProvince')?.value||'').trim(),
+    postalCode:(document.getElementById('cpPostal')?.value||'').trim(),
+    country:'Sri Lanka'
+  };
+  const missing=[];
+  if(data.name.length<2)missing.push('Full Name');
+  if(!data.address)missing.push('Address Line 1');
+  if(!data.city)missing.push('City');
+  if(!data.district)missing.push('District');
+  if(!data.province)missing.push('Province');
+  if(!data.postalCode)missing.push('Postal Code');
+  if(!currentUser.phoneVerified)missing.push('Verified Mobile Number');
+  if(missing.length){showToast('Please complete: '+missing.join(', '),'error');return;}
+  try{
+    const user=firebaseAuth.currentUser;
+    await user.updateProfile({displayName:data.name});
+    await firebaseDb.collection('users').doc(user.uid).set({
+      uid:user.uid,name:data.name,email:user.email||currentUser.email||'',phone:user.phoneNumber||currentUser.phone||'',
+      photoURL:user.photoURL||currentUser.photoURL||'',emailVerified:!!user.emailVerified,phoneVerified:!!user.phoneNumber,
+      loginProvider:currentUser.loginProvider||'customer',role:currentUser.role||'customer',...data,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    },{merge:true});
+    currentUser={...currentUser,...data,name:data.name,email:user.email||currentUser.email||'',phone:user.phoneNumber||currentUser.phone||'',phoneVerified:!!user.phoneNumber};
+    localStorage.setItem('wow_user',JSON.stringify(currentUser));
+    document.getElementById('accName').textContent=currentUser.name;
+    document.getElementById('accEmail').textContent=currentUser.email||currentUser.phone||'';
+    showToast('Your account details have been saved successfully.','success');
+    renderAccount();
+  }catch(e){console.error('Complete account save failed:',e);showToast('Could not save your account details. Please try again.','error');}
+}
+
 async function saveProfile() {
   const name = document.getElementById('pName')?.value?.trim();
   if (!name || name.length < 2) { showToast('Please enter a valid full name.', 'error'); return; }
