@@ -1693,7 +1693,9 @@ let accTab = 'overview';
 // ==================== INIT ====================
 document.addEventListener('DOMContentLoaded', () => {
   initFirebaseAuth();
-  setTimeout(()=>loadRemoteStorefrontData().catch(()=>{}),1200);
+  // Firebase can finish loading a moment after the first render. Retry cloud storefront sync
+  // so phone/PC never remain stuck on their old localStorage copy.
+  [1200,3500,8000].forEach(ms=>setTimeout(()=>loadRemoteStorefrontData().catch(()=>{}),ms));
   lucide.createIcons();
   updateCartUI();
   updateWishlistBadge();
@@ -4074,17 +4076,34 @@ function applyRemoteStorefront(remote){
 async function loadRemoteStorefrontData(){
   try{
     if(!firebaseDb) return false;
-    if(wowRemoteStorefrontUnsubscribe) return true;
     const ref=firebaseDb.collection('siteConfig').doc('storefront');
-    wowRemoteStorefrontUnsubscribe=ref.onSnapshot(snap=>{
-      if(!snap.exists) return;
-      try{ applyRemoteStorefront(snap.data()?.data); }
-      catch(e){ console.warn('WOWSHOPPING storefront snapshot:',e); }
-    },err=>console.warn('WOWSHOPPING storefront listener:',err));
-    const snap=await ref.get();
-    if(snap.exists) return applyRemoteStorefront(snap.data()?.data);
+    if(!wowRemoteStorefrontUnsubscribe){
+      wowRemoteStorefrontUnsubscribe=ref.onSnapshot(snap=>{
+        if(!snap.exists){
+          console.warn('WOWSHOPPING storefront cloud document does not exist yet.');
+          return;
+        }
+        try{
+          const remote=snap.data()?.data;
+          if(remote && typeof remote==='object'){
+            applyRemoteStorefront(remote);
+            console.log('WOWSHOPPING: cloud storefront synced live.', snap.data()?.syncVersion || '');
+          }
+        }catch(e){ console.warn('WOWSHOPPING storefront snapshot apply:',e); }
+      },err=>{
+        console.warn('WOWSHOPPING storefront listener failed:',err?.code||'',err?.message||err);
+      });
+    }
+    const snap=await ref.get({source:'server'}).catch(()=>ref.get());
+    if(snap.exists){
+      const remote=snap.data()?.data;
+      if(remote && typeof remote==='object') return applyRemoteStorefront(remote);
+    }
     return false;
-  }catch(e){console.warn('WOWSHOPPING storefront sync:',e);return false}
+  }catch(e){
+    console.warn('WOWSHOPPING storefront sync failed:',e?.code||'',e?.message||e);
+    return false;
+  }
 }
 function E(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function openHeroLink(url){const u=String(url||'#shop').trim();if(!u)return;if(u.startsWith('#')){const p=u.replace(/^#/, '');if(p==='shop'){navigate('shop');return}if(p==='new'||p==='new-arrivals'){navigate('shop','new');return}document.querySelector(u)?.scrollIntoView({behavior:'smooth'});return}window.location.href=u;}
