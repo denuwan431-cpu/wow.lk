@@ -3257,15 +3257,17 @@ function showAdminTab(tab) {
           <h3 style="font-size:15px;font-weight:700;margin-bottom:20px;">Hero Settings</h3>
           <div style="display:grid;gap:14px;">
             <div><label class="form-label">Media Type</label>
-              <select class="form-select" id="heroMediaType"><option value="image">Image</option><option value="video">Video</option></select>
+              <select class="form-select" id="heroMediaType" onchange="toggleHeroMediaFields()"><option value="image">Image</option><option value="video">Video</option></select>
             </div>
-            <div><label class="form-label">Image URL</label><input class="form-input" value="https://images.pexels.com/photos/3055008/pexels-photo-3055008.jpeg" id="heroImg"/></div>
+            <div id="heroVideoField"><label class="form-label">Video URL <span style="color:#6b7280;font-weight:400">(direct .mp4/.webm URL)</span></label><input class="form-input" placeholder="https://example.com/banner.mp4" id="heroVideoUrl"/></div>
+            <div id="heroImageField"><label class="form-label">Image URL(s) <span style="color:#6b7280;font-weight:400">(one URL per line)</span></label><textarea class="form-input" rows="3" placeholder="https://example.com/banner.jpg" id="heroImageUrls"></textarea></div>
             <div><label class="form-label">Eyebrow Text</label><input class="form-input" value="New Season 2025" id="heroEyebrow"/></div>
             <div><label class="form-label">Main Title</label><input class="form-input" value="Dress Your Confidence" id="heroTitle"/></div>
             <div><label class="form-label">Subtitle</label><textarea class="form-input" rows="2" id="heroSub">Discover premium fashion that speaks before you do.</textarea></div>
             <div><label class="form-label">Button Text</label><input class="form-input" value="Shop Collection" id="heroBtnText"/></div>
             <div><label class="form-label">Button Link</label><input class="form-input" value="#shop" id="heroBtnLink"/></div>
-            <button class="btn btn-dark btn-sm" style="width:fit-content;" onclick="showToast('Hero settings saved','success')">Save Hero</button>
+            <div id="heroUrlHelp" style="font-size:12px;color:#64748b;background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;line-height:1.55">Use a direct media URL. Image URLs should end in an image file or return an image directly. Video URLs must point directly to a playable <b>.mp4</b> or <b>.webm</b> file — YouTube/Instagram page URLs cannot be used as a video source.</div>
+            <button class="btn btn-dark btn-sm" style="width:fit-content;" onclick="saveHeroSettings()">Save Hero</button>
           </div>
         </div>
         <div class="admin-card">
@@ -3780,8 +3782,20 @@ function applyAdminMenu(){
  const wrap=document.createElement('div');wrap.className='admin-managed-menu';wrap.style.cssText='display:flex;align-items:center;gap:4px';const home=document.createElement('div');home.className='nav-link';home.textContent='Home';home.onclick=()=>navigate('home');wrap.appendChild(home);children(null).filter(m=>String(m.title||'').toLowerCase()!=='home').forEach(m=>wrap.appendChild(build(m))); const anchor=nav.querySelector('[style*="margin-left:auto"]');nav.insertBefore(wrap,anchor||nav.lastElementChild); renderStorefrontCategories();
 }
 
-function loadHeroForm(){const h=adminData.hero;const map={heroMediaType:h.mediaType,heroVideoUrl:h.videoUrl,heroImageUrls:(h.images||[]).join('\n'),heroEyebrow:h.eyebrow,heroTitle:h.title,heroSubtitle:h.subtitle,heroButtonText:h.buttonText,heroButtonUrl:h.buttonUrl};Object.keys(map).forEach(id=>{const e=document.getElementById(id);if(e)e.value=map[id]||''});const v=document.getElementById('heroVisible');if(v)v.checked=h.visible!==false}
-function saveHeroSettings(){adminData.hero={mediaType:document.getElementById('heroMediaType').value,videoUrl:document.getElementById('heroVideoUrl').value,images:document.getElementById('heroImageUrls').value.split('\n').map(x=>x.trim()).filter(Boolean),eyebrow:document.getElementById('heroEyebrow').value,title:document.getElementById('heroTitle').value,subtitle:document.getElementById('heroSubtitle').value,buttonText:document.getElementById('heroButtonText').value,buttonUrl:document.getElementById('heroButtonUrl').value,visible:document.getElementById('heroVisible').checked};saveAdminData();applyHeroToSite();renderHeroPreview();showToast('Hero saved','success')}
+function toggleHeroMediaFields(){
+  const type=document.getElementById('heroMediaType')?.value||'image';
+  const vf=document.getElementById('heroVideoField'), inf=document.getElementById('heroImageField');
+  if(vf)vf.style.display=type==='video'?'block':'none';
+  if(inf)inf.style.display=type==='image'?'block':'none';
+}
+function loadHeroForm(){const h=adminData.hero||{};const map={heroMediaType:h.mediaType||'image',heroVideoUrl:h.videoUrl||'',heroImageUrls:(h.images||[]).join('\n'),heroEyebrow:h.eyebrow||'',heroTitle:h.title||'',heroSubtitle:h.subtitle||'',heroButtonText:h.buttonText||'',heroButtonUrl:h.buttonUrl||''};Object.keys(map).forEach(id=>{const e=document.getElementById(id);if(e)e.value=map[id]||''});const v=document.getElementById('heroVisible');if(v)v.checked=h.visible!==false;toggleHeroMediaFields()}
+function saveHeroSettings(){
+  const mediaType=document.getElementById('heroMediaType')?.value||'image';
+  const videoUrl=String(document.getElementById('heroVideoUrl')?.value||'').trim();
+  const images=String(document.getElementById('heroImageUrls')?.value||'').split('\n').map(x=>x.trim()).filter(Boolean);
+  adminData.hero={mediaType,videoUrl,images,eyebrow:document.getElementById('heroEyebrow')?.value||'',title:document.getElementById('heroTitle')?.value||'',subtitle:document.getElementById('heroSubtitle')?.value||'',buttonText:document.getElementById('heroButtonText')?.value||'',buttonUrl:document.getElementById('heroButtonUrl')?.value||'#shop',visible:document.getElementById('heroVisible')?.checked!==false};
+  saveAdminData();applyHeroToSite();renderHeroPreview();showToast('Hero saved','success');
+}
 function renderHeroPreview(){const el=document.getElementById('heroAdminPreview');if(!el)return;const h=adminData.hero;if(!h.visible){el.innerHTML='<span>Hero hidden</span>';return}if(h.mediaType==='video'&&h.videoUrl)el.innerHTML=`<video src="${esc(h.videoUrl)}" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover"></video>`;else if(h.images.length)el.innerHTML=`<img src="${esc(h.images[0])}" style="width:100%;height:100%;object-fit:cover">`;else el.innerHTML='<span>Add a video URL or image URLs</span>'}
 function applyPromiseToSite(){const el=document.getElementById('storePromiseSection');if(!el)return;const d=loadAdminData(),p=d.promise||{};const cards=Array.isArray(p.cards)?p.cards.filter(x=>x&&x.visible!==false).slice(0,3):[];if(p.visible===false||!cards.length){el.style.display='none';el.innerHTML='';return;}el.style.display='block';el.innerHTML=`<section class="wow-promise-section"><div class="wow-promise-wrap"><div class="wow-promise-label">${esc(p.label||'Our Promise')}</div><h2 class="wow-promise-title">${esc(p.title||'Why Shop With Us?')}</h2><p class="wow-promise-desc">${esc(p.description||'')}</p><div class="wow-promise-grid">${cards.map(c=>`<div class="wow-promise-card"><div class="wow-promise-icon"><i data-lucide="${esc(c.icon||'star')}"></i></div><h3>${esc(c.title||'')}</h3><p>${esc(c.text||'')}</p></div>`).join('')}</div></div></section>`;if(window.lucide?.createIcons)lucide.createIcons();}
 function applyBenefitsToSite(){
@@ -3795,7 +3809,33 @@ function applyBenefitsToSite(){
   el.innerHTML=`<div class="wow-benefits-inner"><div class="wow-benefits-grid">${cards.map(c=>`<div class="wow-benefit-card"><div class="wow-benefit-icon"><i data-lucide="${esc(c.icon||'star')}"></i></div><div class="wow-benefit-copy"><div class="wow-benefit-title">${esc(c.title||'')}</div><div class="wow-benefit-text">${esc(c.text||'')}</div></div></div>`).join('')}</div></div>`;
   if(window.lucide?.createIcons)lucide.createIcons();
 }
-function applyHeroToSite(){return;}
+function applyHeroToSite(){
+  const h=adminData.hero||{}, hero=document.querySelector('.hero-section');
+  if(!hero)return;
+  hero.style.display=h.visible===false?'none':'flex';
+  hero.querySelectorAll('.v6-media').forEach(x=>x.remove());
+  const shell=document.createElement('div'); shell.className='v6-media';
+  shell.style.cssText='position:absolute;inset:0;width:100%;height:100%;z-index:0;overflow:hidden;pointer-events:none;background:#050b16';
+  hero.insertBefore(shell,hero.firstChild);
+  const type=h.mediaType||'image';
+  if(type==='video' && h.videoUrl){
+    const v=document.createElement('video');
+    v.src=String(h.videoUrl).trim(); v.autoplay=true; v.muted=true; v.defaultMuted=true; v.loop=true; v.playsInline=true; v.preload='auto';
+    v.setAttribute('playsinline','');v.setAttribute('webkit-playsinline','');v.setAttribute('muted','');v.setAttribute('autoplay','');v.setAttribute('loop','');
+    v.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block;background:#050b16';
+    v.onerror=()=>{shell.innerHTML='';const im=document.createElement('img');im.src=(h.images||[])[0]||'';im.alt='';im.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover';shell.appendChild(im)};
+    shell.appendChild(v); v.play().catch(()=>{});
+  }else if(Array.isArray(h.images)&&h.images.length){
+    const im=document.createElement('img');im.alt='';im.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center';
+    let i=0; const show=()=>{im.src=h.images[i];i=(i+1)%h.images.length}; show();
+    im.onerror=()=>{im.style.display='none'}; shell.appendChild(im);
+    if(h.images.length>1){clearInterval(window.__wowHeroTimer);window.__wowHeroTimer=setInterval(show,5000)}
+  }
+  const he=hero.querySelector('.hero-eyebrow'),ht=hero.querySelector('.hero-title'),hs=hero.querySelector('.hero-sub'),pb=hero.querySelector('#heroPrimaryBtn'),sb=hero.querySelector('#heroSecondaryBtn');
+  if(he)he.textContent=h.eyebrow||''; if(ht)ht.innerHTML=esc(h.title||'').replace(/\n/g,'<br>'); if(hs)hs.textContent=h.subtitle||'';
+  if(pb){pb.childNodes[0].nodeValue=(h.buttonText||'Shop Collection')+' ';pb.onclick=()=>openHeroLink(h.buttonUrl||'#shop')}
+  if(sb){sb.style.display='none'}
+}
 
 function adminOpenBanner(id,slot){const existing=id?adminData.banners.find(x=>x.id===id):adminData.banners.find(x=>x.position===slot);const b=existing||{id:uid('b'),title:'',desktop:'',mobile:'',description:'',button:'Shop Now',url:'#shop',category:'',position:slot||'mid',visible:true,order:slot==='mid'?1:2};adminModal(`<h2>${existing?'Edit':'Add'} Banner</h2><div class="admin-form"><div class="admin-field"><label>Banner slot</label><select id="abPosition"><option value="mid">Banner 1 — below products</option><option value="bottom">Banner 2 — below Banner 1</option></select></div><div class="admin-two"><div class="admin-field"><label>Title</label><input id="abTitle" value="${esc(b.title)}"></div><div class="admin-field"><label>Category link</label><input id="abCategory" value="${esc(b.category||'')}"></div></div><div class="admin-field"><label>Desktop image URL</label><input id="abDesktop" value="${esc(b.desktop)}"></div><div class="admin-field"><label>Mobile image URL</label><input id="abMobile" value="${esc(b.mobile)}"></div><div class="admin-field"><label>Upload banner image</label><input type="file" accept="image/*" onchange="readSingleImage(this,'abDesktop')"></div><div class="admin-field"><label>Description</label><textarea id="abDesc">${esc(b.description)}</textarea></div><div class="admin-three"><div class="admin-field"><label>Button</label><input id="abButton" value="${esc(b.button)}"></div><div class="admin-field"><label>URL</label><input id="abUrl" value="${esc(b.url)}"></div><div class="admin-field"><label>Visible</label><select id="abVisible"><option value="1" ${b.visible!==false?'selected':''}>Show</option><option value="0" ${b.visible===false?'selected':''}>Hide</option></select></div></div><div><button class="admin-btn" onclick="closeAdminModal()">Cancel</button><button class="admin-btn primary" onclick="saveBanner('${b.id}')">Save Banner</button></div></div>`);document.getElementById('abPosition').value=b.position||slot||'mid'}
 function saveBanner(id){const old=adminData.banners.find(x=>x.id===id);const position=document.getElementById('abPosition').value;adminData.banners=adminData.banners.filter(x=>x.id===id||x.position!==position);const b={id,title:document.getElementById('abTitle').value,category:document.getElementById('abCategory').value,desktop:document.getElementById('abDesktop').value,mobile:document.getElementById('abMobile').value,description:document.getElementById('abDesc').value,button:document.getElementById('abButton').value,url:document.getElementById('abUrl').value,position,visible:document.getElementById('abVisible').value==='1',order:position==='mid'?1:2};const i=adminData.banners.findIndex(x=>x.id===id);if(i>=0)adminData.banners[i]=b;else adminData.banners.push(b);saveAdminData();closeAdminModal();renderAdminAll();showToast('Banner saved','success')}
@@ -3924,7 +3964,7 @@ function patch(){
  // Remove top Shop All button permanently.
  document.querySelectorAll('#site-header button').forEach(b=>{if(b.textContent.trim()==='Shop All')b.parentElement.remove()});
  // Hero: video URL only, otherwise image slider.
- const h={...(d.hero||{}),mediaType:'video',videoUrl:String(d.hero?.videoUrl||'').trim()}, hero=document.querySelector('.hero-section');
+ const h={...(d.hero||{}),mediaType:(d.hero?.mediaType||'image'),videoUrl:String(d.hero?.videoUrl||'').trim()}, hero=document.querySelector('.hero-section');
  if(hero){
   hero.style.display=h.visible===false?'none':'flex';
   hero.style.position='relative';
