@@ -1311,8 +1311,13 @@ async function initFirebaseAuth() {
       }
       authStateReady=true;
       updateHeaderAccountBtn();
-      // Auth restoration must never force the customer away from the Home tab.
-      // The SPA starts on Home after every full reload while the Firebase session remains persisted.
+      // After a successful Google login/reload, always keep the storefront on Home.
+      // Firebase LOCAL persistence restores the signed-in user without showing the login UI again.
+      closeAuth();
+      if(currentUser && currentPage!=='home' && sessionStorage.getItem('wow_google_login_reload')==='1'){
+        sessionStorage.removeItem('wow_google_login_reload');
+        navigate('home');
+      }
       if(currentPage==='account'&&currentUser)renderAccount();
     });
   }catch(err){
@@ -2617,7 +2622,17 @@ async function doGoogleLogin(){
     const provider=new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({prompt:'select_account'});
     await firebaseAuth.signInWithPopup(provider);
-    // onAuthStateChanged is the source of truth; it will close/update the UI.
+
+    // Google login succeeded: immediately close the login modal, go to Home,
+    // and reload once so the authenticated session is fully reflected in the UI.
+    // Firebase LOCAL persistence keeps the Google session after the reload.
+    sessionStorage.setItem('wow_google_login_reload','1');
+    closeAuth();
+    navigate('home');
+    setTimeout(() => {
+      try { window.location.replace(window.location.href.split('#')[0]); }
+      catch(e) { window.location.reload(); }
+    }, 120);
   }catch(e){
     console.error('Google sign-in failed:',e);
     const code=e?.code||'';
