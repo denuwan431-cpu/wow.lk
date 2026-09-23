@@ -698,7 +698,26 @@ function branding(){let b=d.branding||{};v('branding').innerHTML=`<div class="ca
 function cleanImageUrl(x){x=String(x||'').trim();if(!x)return '';if(/^['"]/.test(x)&&/["']$/.test(x))x=x.slice(1,-1);return x}
 function previewBrandImage(inputId,previewId){const url=cleanImageUrl(document.getElementById(inputId)?.value);const box=document.getElementById(previewId);if(!box)return;if(!url){box.innerHTML='';return}box.innerHTML=`<div style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid #e5e7eb;border-radius:10px;background:#fff"><img src="${esc(url)}" style="width:72px;height:48px;object-fit:contain;border-radius:7px;background:#f3f4f6" onerror="this.style.display='none';this.nextElementSibling.textContent='Image URL could not be loaded'"><span class="muted">Preview</span></div>`}
 function saveBranding(){const name=(document.getElementById('brn')?.value||'').trim();const title=(document.getElementById('brt')?.value||'').trim();const logo=cleanImageUrl(document.getElementById('brl')?.value);const icon=cleanImageUrl(document.getElementById('bri')?.value);const favicon=cleanImageUrl(document.getElementById('brfv')?.value);const footer=(document.getElementById('brf')?.value||'').trim();d.branding={...(d.branding||{}),name,title,logo,icon,favicon,footer};save();toast('Branding saved — refresh the storefront to see the favicon/logo.')}
-function toggle(type,ident){let x=d[type].find(x=>x.id===ident);if(x){x.visible=x.visible===false;save()}}function del(type,ident){if(confirm('Delete this item?')){d[type]=d[type].filter(x=>x.id!==ident);save()}}
+function toggle(type,ident){let x=(d[type]||[]).find(x=>String(x.id)===String(ident));if(x){x.visible=x.visible===false;save()}}
+function del(type,ident){
+  if(!confirm('Delete this item?'))return;
+  const sid=String(ident);
+  if(type==='categories'){
+    const cat=(d.categories||[]).find(x=>String(x.id)===sid);
+    if(!cat){toast('Category not found');return;}
+    const catName=String(cat.name||'').trim().toLowerCase();
+    d.categories=(d.categories||[]).filter(x=>String(x.id)!==sid);
+    // Keep products, but remove the deleted category assignment so the category is truly gone.
+    (d.products||[]).forEach(p=>{if(String(p.category||'').trim().toLowerCase()===catName)p.category='';});
+    // Remove category links from menu items without deleting the menu itself.
+    (d.menu||[]).forEach(m=>{if(String(m.category||'').trim().toLowerCase()===catName)m.category='';});
+    save();
+    return;
+  }
+  if(!Array.isArray(d[type]))return;
+  d[type]=d[type].filter(x=>String(x.id)!==sid);
+  save();
+}
 function open(html){document.getElementById('modalbox').innerHTML=html;document.getElementById('modal').classList.add('open')}function closeModal(){document.getElementById('modal').classList.remove('open');document.getElementById('modalbox').innerHTML=''}
 
 function care(){v('care').innerHTML=`<div class="toolbar"><b>Customer Care links</b><button class="btn primary" onclick="editCare()">+ Add</button></div><div class="card">${(d.care.cards||[]).map(c=>`<div class="row"><div><b>${esc(c.title)}</b><div class="muted">${esc(c.text||'')} · ${esc(c.href||'')}</div></div><div class="actions"><button class="btn" onclick="editCare('${c.id}')">Edit</button><button class="btn" onclick="toggleCare('${c.id}')">${c.visible===false?'Show':'Hide'}</button><button class="btn danger" onclick="deleteCare('${c.id}')">Delete</button></div></div>`).join('')}</div><div class="card"><b>Email removal</b><p class="muted">The hard-coded Email Us card is hidden. Add a replacement only if you want one.</p></div>`}
