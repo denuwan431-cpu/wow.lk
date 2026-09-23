@@ -263,17 +263,31 @@ button{transition:all .15s ease}
   font-weight:700;
 }
 
-.photo-manager{border:1px solid #e5e7eb;border-radius:10px;padding:14px;background:#fafafa}
-.photo-manager-head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.photo-manager{border:1px solid #e2e8f0;border-radius:18px;padding:20px;background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);box-shadow:0 8px 28px rgba(15,23,42,.05);margin:8px 0}
+.photo-manager-head{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.photo-manager-head b{display:block;font-size:16px;letter-spacing:-.2px;margin:3px 0}
+.pm-section-kicker{font-size:10px;font-weight:800;letter-spacing:1.4px;color:#64748b}
 .photo-upload{display:inline-flex;align-items:center;gap:8px}
 .photo-upload input{display:none}
-.photo-upload label{cursor:pointer}
-.photo-preview{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px;margin-top:12px}
-.photo-item{position:relative;border:1px solid #e5e7eb;border-radius:8px;background:#fff;padding:5px}
-.photo-item img{display:block;width:100%;height:100px;object-fit:cover;border-radius:6px}
-.photo-item small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:5px;color:#667085;font-size:10px}
-.photo-item button{position:absolute;right:7px;top:7px;border:0;background:rgba(17,24,39,.82);color:#fff;width:24px;height:24px;border-radius:50%;cursor:pointer;line-height:24px;padding:0}
-.photo-item .photo-index{position:absolute;left:7px;top:7px;background:rgba(255,255,255,.92);color:#111827;font-weight:800;border-radius:5px;padding:2px 5px;font-size:10px}
+.upload-btn{display:inline-flex;align-items:center;gap:9px;cursor:pointer;border:1px solid #0f172a;background:#0f172a;color:#fff;border-radius:11px;padding:11px 15px;font-weight:750;box-shadow:0 6px 16px rgba(15,23,42,.15)}
+.upload-btn:hover{background:#1e293b;transform:translateY(-1px)}
+.upload-icon{font-size:18px;line-height:1}
+.photo-dropzone{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:150px;border:1.5px dashed #cbd5e1;border-radius:14px;background:#f8fafc;cursor:pointer;text-align:center;padding:22px;transition:.18s ease}
+.photo-dropzone:hover,.photo-dropzone.dragging{border-color:#0f172a;background:#f1f5f9;box-shadow:inset 0 0 0 1px rgba(15,23,42,.04)}
+.photo-dropzone .drop-icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:#fff;border:1px solid #e2e8f0;font-size:24px;color:#0f172a;margin-bottom:3px}
+.photo-dropzone strong{font-size:14px;color:#0f172a}
+.photo-dropzone span{font-size:12px;color:#64748b}
+.photo-dropzone small{font-size:10px;color:#94a3b8;margin-top:5px}
+.photo-data-store{display:none!important}
+.photo-preview{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:12px;margin-top:16px}
+.photo-item{position:relative;border:1px solid #e2e8f0;border-radius:13px;background:#fff;padding:6px;overflow:hidden;box-shadow:0 4px 15px rgba(15,23,42,.05)}
+.photo-item img{display:block;width:100%;height:128px;object-fit:cover;border-radius:9px;background:#f1f5f9}
+.photo-item small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:7px 4px 3px;color:#64748b;font-size:10px;font-weight:700}
+.photo-item button{position:absolute;right:10px;top:10px;border:1px solid rgba(255,255,255,.35);background:rgba(15,23,42,.86);color:#fff;width:28px;height:28px;border-radius:8px;cursor:pointer;line-height:25px;padding:0;font-size:17px;z-index:2}
+.photo-item .photo-index{position:absolute;left:10px;top:10px;background:rgba(255,255,255,.95);color:#0f172a;font-weight:800;border-radius:7px;padding:4px 7px;font-size:10px;z-index:2}
+.photo-item .photo-main{display:inline-flex;align-items:center;gap:4px;margin:0 4px 5px;padding:4px 7px;border-radius:6px;background:#0f172a;color:#fff;font-size:9px;font-weight:800;letter-spacing:.3px}
+.photo-item .photo-make-main{display:block;width:calc(100% - 8px);margin:0 4px 6px;border:1px solid #dbe2ea;background:#f8fafc;color:#334155;border-radius:7px;padding:6px;font-size:10px;font-weight:750;cursor:pointer}
+.photo-item .photo-make-main:hover{background:#eef2f7}
 
 .product-name{font-weight:750}
 .product-meta{font-size:11px;color:#8a94a6;margin-top:3px}
@@ -500,7 +514,7 @@ function editProduct(pid){
  h+=A+'Sale / Discounted Price</label><input id="psp" type="number" min="0" value="'+(p.salePrice||0)+'" oninput="calcDiscountFromSale()"></div>'+A+'Currency</label><select id="pcurrency">'+pmOptions(['LKR','USD','EUR','GBP'],p.currency||'LKR')+'</select></div></div>';
  h+=A+'Total Stock</label><input id="pst" type="number" min="0" value="'+(p.stock||0)+'"></div>'+A+'Material / Specification</label><input id="pmat" value="'+esc(p.material||'')+'" placeholder="Cotton, Leather, Stainless Steel..."></div></div>';
  h+=A+'Product Video URL — optional</label><input id="pvideo" value="'+esc(p.productVideo||'')+'" placeholder="https://example.com/product.mp4"></div>'+A+'Badge</label><select id="pbadge">'+pmOptions(['None','New Arrival','Hot Deal','Best Seller','Limited','Trending'],p.badge||'None')+'</select></div></div>';
- h+='<div class="photo-manager"><div class="photo-manager-head"><div><b>Product Photos</b><div class="muted">Add as many photos as you need. The first photo is the main/cover photo.</div></div><div class="photo-upload"><input id="pfiles" type="file" accept="image/*" multiple onchange="addProductPhotos(event)"><label class="btn primary" for="pfiles">+ Upload Multiple Photos</label></div></div><div class="field"><label>Photo URLs — one URL per line</label><textarea id="pi" oninput="renderProductPhotoPreview()">'+esc((p.images||[]).join('\n'))+'</textarea><div class="muted">You can mix uploaded photos and image URLs. JPG, PNG, WEBP and other browser-supported image formats are accepted.</div></div><div id="photoPreview" class="photo-preview"></div></div>';
+ h+='<div class="photo-manager"><div class="photo-manager-head"><div><div class="pm-section-kicker">MEDIA</div><b>Product Photos</b><div class="muted">Upload photos directly from your computer. The first photo is used as the product cover.</div></div><div class="photo-upload"><input id="pfiles" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple onchange="addProductPhotos(event)"><label class="upload-btn" for="pfiles"><span class="upload-icon">↥</span><span>Choose Photos</span></label></div></div><label class="photo-dropzone" for="pfiles" id="photoDropzone" ondragover="event.preventDefault();this.classList.add(\'dragging\')" ondragleave="this.classList.remove(\'dragging\')" ondrop="handleProductPhotoDrop(event)"><div class="drop-icon">＋</div><strong>Drag & drop product photos here</strong><span>or click to browse from your device</span><small>JPG, PNG, WEBP or GIF • Up to 30 photos • Images are optimized automatically</small></label><textarea id="pi" class="photo-data-store" aria-hidden="true">'+esc((p.images||[]).join('\n'))+'</textarea><div id="photoPreview" class="photo-preview"></div></div>';
  h+=A+'Sizes — optional</label><input id="psz" value="'+esc((p.sizes||[]).join(', '))+'" placeholder="S, M, L, XL or 38, 39, 40"></div>'+A+'Colors — optional</label><input id="pco" value="'+esc((p.colors||[]).join(', '))+'" placeholder="Black, White, Silver"></div></div>';
  h+='<div class="two"><div class="field"><label>Product Badge</label><select id="pbadge">'+pmOptions(['None','New Arrival','Hot Deal','Best Seller','Limited','Trending'],p.badge||'None')+'</select></div><div class="field"><label>Barcode / Reference</label><input id="pbarcode" value="'+esc(p.barcode||'')+'" placeholder="Optional reference"></div></div>';
  h+='<div class="card" style="margin:0;padding:14px;background:#fafafa"><h3 style="margin-top:0">Detailed Product Information</h3><div class="two"><div class="field"><label>Pattern / Design</label><input id="ppattern" value="'+esc(p.pattern||'')+'"></div><div class="field"><label>Fit / Shape</label><input id="pfit" value="'+esc(p.fit||'')+'"></div><div class="field"><label>Season / Collection</label><input id="pseason" value="'+esc(p.season||'')+'"></div><div class="field"><label>Occasion</label><input id="poccasion" value="'+esc(p.occasion||'')+'"></div><div class="field"><label>Care Instructions</label><input id="pcare" value="'+esc(p.care||'')+'"></div><div class="field"><label>Country of Origin</label><input id="porigin" value="'+esc(p.origin||'')+'"></div><div class="field"><label>Weight</label><input id="pweight" value="'+esc(p.weight||'')+'" placeholder="e.g. 250g"></div><div class="field"><label>Dimensions</label><input id="pdimensions" value="'+esc(p.dimensions||'')+'" placeholder="e.g. 30 x 20 x 10 cm"></div><div class="field"><label>Warranty</label><input id="pwarranty" value="'+esc(p.warranty||'')+'"></div><div class="field"><label>Water Resistance</label><input id="pwater" value="'+esc(p.waterResistance||'')+'"></div></div></div>';
@@ -526,25 +540,67 @@ function setProductPhotoList(list){
 function renderProductPhotoPreview(){
   const box=document.getElementById('photoPreview'); if(!box)return;
   const imgs=getProductPhotoList();
-  if(!imgs.length){box.innerHTML='<div class="muted" style="grid-column:1/-1;padding:12px 0">No product photos added yet.</div>';return}
-  box.innerHTML=imgs.map((src,i)=>`<div class="photo-item"><span class="photo-index">${i+1}</span><button type="button" title="Remove" onclick="removeProductPhoto(${i})">×</button><img src="${esc(src)}" onerror="this.style.opacity='.25'" alt="Product photo ${i+1}"><small>${i===0?'Main photo':'Photo '+(i+1)}</small></div>`).join('');
+  if(!imgs.length){
+    box.innerHTML='<div class="muted" style="grid-column:1/-1;text-align:center;padding:18px">No photos added yet. Upload your product images above.</div>';
+    return;
+  }
+  box.innerHTML=imgs.map((src,i)=>`<div class="photo-item"><span class="photo-index">${i+1}</span><button type="button" title="Remove photo" onclick="removeProductPhoto(${i})">×</button><img src="${esc(src)}" onerror="this.style.opacity='.25'" alt="Product photo ${i+1}">${i===0?'<span class="photo-main">✓ MAIN PHOTO</span>':'<button type="button" class="photo-make-main" onclick="makeProductPhotoMain('+i+')">Make main photo</button>'}<small>${i===0?'Cover / Main image':'Product image '+(i+1)}</small></div>`).join('');
 }
 function removeProductPhoto(index){
   const imgs=getProductPhotoList(); imgs.splice(index,1); setProductPhotoList(imgs);
 }
+function makeProductPhotoMain(index){
+  const imgs=getProductPhotoList();
+  if(index<0||index>=imgs.length)return;
+  const chosen=imgs.splice(index,1)[0]; imgs.unshift(chosen); setProductPhotoList(imgs);
+}
+function handleProductPhotoDrop(ev){
+  ev.preventDefault();
+  ev.currentTarget.classList.remove('dragging');
+  const files=[...(ev.dataTransfer?.files||[])];
+  addProductPhotoFiles(files);
+}
 function addProductPhotos(ev){
-  const files=[...(ev.target.files||[])];
+  addProductPhotoFiles([...(ev.target.files||[])]);
+  ev.target.value='';
+}
+function addProductPhotoFiles(files){
   if(!files.length)return;
   const current=getProductPhotoList();
   const remaining=Math.max(0,30-current.length);
+  if(!remaining){alert('Maximum 30 photos per product.');return}
+  let accepted=0;
   files.slice(0,remaining).forEach(file=>{
-    if(!file.type.startsWith('image/'))return;
+    if(!/^image\/(jpeg|png|webp|gif)$/.test(file.type))return;
+    accepted++;
     const reader=new FileReader();
-    reader.onload=()=>{current.push(String(reader.result));setProductPhotoList(current)};
+    reader.onload=()=>{
+      const data=String(reader.result||'');
+      optimizeProductImage(data,file.type).then(result=>{
+        current.push(result);
+        setProductPhotoList(current);
+      });
+    };
     reader.readAsDataURL(file);
   });
-  if(files.length>remaining) alert('Maximum 30 photos per product.');
-  ev.target.value='';
+  if(files.length>remaining)alert('Maximum 30 photos per product.');
+  if(!accepted)alert('Please select JPG, PNG, WEBP or GIF image files.');
+}
+function optimizeProductImage(dataUrl,type){
+  return new Promise(resolve=>{
+    const img=new Image();
+    img.onload=()=>{
+      const max=1600;
+      const scale=Math.min(1,max/Math.max(img.width,img.height));
+      const w=Math.max(1,Math.round(img.width*scale)),h=Math.max(1,Math.round(img.height*scale));
+      const canvas=document.createElement('canvas'); canvas.width=w; canvas.height=h;
+      const ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,w,h);
+      const mime=type==='image/png'?'image/webp':'image/webp';
+      try{resolve(canvas.toDataURL(mime,.84));}catch(e){resolve(dataUrl)}
+    };
+    img.onerror=()=>resolve(dataUrl);
+    img.src=dataUrl;
+  });
 }
 
 function calcDiscountFromSale(){const r=+document.getElementById('pp')?.value||0,s=+document.getElementById('psp')?.value||0;if(r>0&&s>=0){document.getElementById('pdisc').value=Math.max(0,Math.min(100,Math.round((1-s/r)*100)));}calcDiscountPreview()}
