@@ -33,7 +33,7 @@
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <!-- Firebase Authentication / Firestore. Add your Firebase web config in the FIREBASE_CONFIG object below. -->
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
   <style>
     :root {
@@ -1577,7 +1577,17 @@ async function initFirebaseAuth() {
     try{ await firebaseAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); }
     catch(e){ console.warn('Auth persistence:',e); }
 
-    // Google uses popup sign-in below. This avoids redirect-state loss on Vercel/custom domains.
+    // Google sign-in is handled below with popup on desktop and redirect on mobile.
+    // Redirect is more reliable on real Android/iPhone browsers where popups can be blocked.
+    try {
+      await firebaseAuth.getRedirectResult();
+    } catch (e) {
+      console.error('Google redirect sign-in failed:', e);
+      const code = e?.code || '';
+      if (code === 'auth/unauthorized-domain') {
+        console.error('Add this production domain to Firebase Authentication > Settings > Authorized domains:', location.hostname);
+      }
+    }
 
     firebaseAuth.onAuthStateChanged(async user=>{
       if(user){
@@ -2862,26 +2872,43 @@ async function verifyPhoneOtp(){
 }
 
 async function doGoogleLogin(){
-  if(!authConfigured()){showToast('Firebase authentication is not available.','error');return}
+  if(!authConfigured()){
+    showToast('Firebase Google authentication is not configured.','error');
+    return;
+  }
+
   const button=document.querySelector('.wow-auth-google');
   try{
     if(button){button.disabled=true;button.style.opacity='.72';}
-    // Keep the Firebase session in browser LOCAL persistence before opening Google.
-    try{await firebaseAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);}catch(e){console.warn('Google persistence:',e)}
+
+    await firebaseAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
     const provider=new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({prompt:'select_account'});
+
+    // Real Firebase Google OAuth. Use redirect on phones for maximum reliability,
+    // because mobile browsers commonly block OAuth popups.
+    const isMobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || window.innerWidth < 768;
+    if(isMobile){
+      await firebaseAuth.signInWithRedirect(provider);
+      return;
+    }
+
     await firebaseAuth.signInWithPopup(provider);
-    // onAuthStateChanged is the source of truth; it will close/update the UI.
+    // onAuthStateChanged() is the source of truth and updates the account UI.
   }catch(e){
     console.error('Google sign-in failed:',e);
     const code=e?.code||'';
     if(code==='auth/popup-closed-by-user') showToast('Google sign-in was cancelled.','info');
-    else if(code==='auth/popup-blocked') showToast('Please allow popups for wow-html-amber.vercel.app and try again.','error');
+    else if(code==='auth/popup-blocked') showToast('Google popup was blocked. Please allow popups and try again.','error');
+    else if(code==='auth/unauthorized-domain') showToast('This website is not authorized for Google login in Firebase. Add this domain in Firebase Authentication settings.','error');
+    else if(code==='auth/operation-not-allowed') showToast('Google sign-in is not enabled in Firebase Authentication.','error');
     else showToast('Google sign-in failed: '+(code.replace('auth/','')||e?.message||'Unknown error'),'error');
   }finally{
     if(button){button.disabled=false;button.style.opacity='1';}
   }
 }
+
 
 async function logout(){try{if(firebaseReady&&firebaseAuth)await firebaseAuth.signOut();currentUser=null;localStorage.removeItem('wow_user');updateHeaderAccountBtn();navigate('home');showToast('Signed out successfully','info')}catch(e){console.error(e);showToast('Sign out failed.','error')}}
 
